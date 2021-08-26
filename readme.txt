@@ -4,7 +4,7 @@ Plugin URI:  https://n3rds.work/shop/artikel/defekter-link-checker-plugin/
 Contributors: DerN3rd
 Donate link: https://n3rds.work/piestingtalfunding/unterstuetze-unsere-psource-free-werke/
 Tags: links, broken, detect, seo, usability, 
-Requires at least: 5.1
+Requires at least: 4.9
 Tested up to: 5.6
 Requires PHP: 7.2
 Stable tag: 4.3

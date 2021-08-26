@@ -4,7 +4,7 @@
  * Plugin Name: WMS N@W Link Checker
  * Plugin URI:  https://n3rds.work/shop/artikel/defekter-link-checker-plugin/
  * Description: Überprüft Deine Seite auf fehlerhafte Links und fehlende Bilder und benachrichtigt Dich im Dashboard, falls gefunden.
- * Version:     1.0.5
+ * Version:     1.0.6
  * Author:      WMS N@W
  * Author URI:  https://n3rds.work
  * Text Domain: psource-link-checker
