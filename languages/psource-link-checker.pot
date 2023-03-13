@@ -26,11 +26,11 @@ msgid "Lade..."
 msgstr ""
 
 #: core/core.php:180
-msgid "[ Network error ]"
+msgid "[ Netzwerkfehler ]"
 msgstr ""
 
 #: core/core.php:207
-msgid "Automatically expand the widget if broken links have been detected"
+msgid "Erweitere das Widget automatisch, wenn defekte Links erkannt wurden"
 msgstr ""
 
 #: core/core.php:298

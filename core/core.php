@@ -177,7 +177,7 @@ class wsBrokenLinkChecker {
 								}
 								<?php } ?>
 							} else {
-								$('#wsblc_activity_box').html('<?php _e('[ Network error ]', 'psource-link-checker'); ?>');
+								$('#wsblc_activity_box').html('<?php _e('[ Netzwerkfehler ]', 'psource-link-checker'); ?>');
 							}
 
 							setTimeout( blcDashboardStatus, 120*1000 ); //...update every two minutes
@@ -204,7 +204,7 @@ class wsBrokenLinkChecker {
 		?>
 		<p><label for="blc-autoexpand">
 			<input id="blc-autoexpand" name="blc-autoexpand" type="checkbox" value="1" <?php if ( $this->conf->options['autoexpand_widget'] ) echo 'checked="checked"'; ?> />
-			<?php _e('Automatically expand the widget if broken links have been detected', 'psource-link-checker'); ?>
+			<?php _e('Erweitere das Widget automatisch, wenn defekte Links erkannt wurden', 'psource-link-checker'); ?>
 		</label></p>
 		<?php
     }

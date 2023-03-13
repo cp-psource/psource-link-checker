@@ -26,8 +26,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Broken Link Checker. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
 */
-require 'includes/psource-plugin-update/plugin-update-checker.php';
-$MyUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+require 'psource/psource-plugin-update/psource-plugin-updater.php';
+use Psource\PluginUpdateChecker\v5\PucFactory;
+$MyUpdateChecker = PucFactory::buildUpdateChecker(
 	'https://n3rds.work//wp-update-server/?action=get_metadata&slug=psource-link-checker', 
 	__FILE__, 
 	'psource-link-checker' 
