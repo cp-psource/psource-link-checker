@@ -63,7 +63,7 @@ class wsScreenOptions13 {
 	/**
 	 * Populate a lookup array for screen -> panels queries.
 	 *
-	 * This is a callback for the "current_screen" action. We have to do it in this hook or WordPress will
+	 * This is a callback for the "current_screen" action. We have to do it in this hook or ClassicPress will
 	 * complain about "doing it wrong" and incorrectly suggest using the "add_meta_boxes" action.
 	 *
 	 * "add_meta_boxes" doesn't work here because it only gets called on CPT pages and we want the ability

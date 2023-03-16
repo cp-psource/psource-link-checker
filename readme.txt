@@ -3,11 +3,11 @@
 Plugin URI:  https://n3rds.work/shop/artikel/defekter-link-checker-plugin/
 Contributors: DerN3rd
 Donate link: https://n3rds.work/piestingtalfunding/unterstuetze-unsere-psource-free-werke/
-Tags: links, broken, detect, seo, usability, 
+Tags: links, broken, detect, seo, usability, classicpress-plugin
 Requires at least: 4.9
 Tested up to: 5.6
 Requires PHP: 7.2
-Stable tag: 4.3
+Stable tag: 1.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,3 +124,7 @@ how about Would you like to support us with a coffee donation while working on o
 Make a [donation by bank transfer or PayPal](https://n3rds.work/spenderaktionen/unterstuetze-unsere-psource-free-werke/) we thank you!
 
 == ChangeLog ==
+
+= 1.0.7 =
+
+* Release Psource

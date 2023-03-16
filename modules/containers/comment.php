@@ -148,7 +148,7 @@ class blcComment extends blcContainer{
 		$post = get_post($comment->comment_post_ID); /* @var StdClass $post */
 
 		//If the post type no longer exists, we can't really do anything with this comment.
-		//WordPress will just throw errors if we try.
+		//ClassicPress will just throw errors if we try.
 		if ( !post_type_exists(get_post_type($post)) ) {
 			return $actions;
 		}

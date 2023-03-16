@@ -13,7 +13,7 @@ define('BLC_ACTIVE', true);
 //plugins, so use function detection to determine the version. get_post_stati was introduced in WP 3.0.0
 if ( !function_exists('get_post_stati') ){
 	trigger_error(
-		'Diese Version von Link Checker benötigt WordPress 3.0 oder höher!',
+		'Diese Version von Link Checker benötigt ClassicPress 3.0 oder höher!',
 		E_USER_ERROR
 	);
 }
@@ -68,7 +68,7 @@ $blc_config_manager = new blcConfigurationManager(
 		'recheck_threshold' => 30*60,	//(in seconds) Re-check broken links after 30 minutes.   
 		
 		'run_in_dashboard' => true,		//Run the link checker algo. continuously while the Dashboard is open.
-		'run_via_cron' => true,			//Run it hourly via WordPress pseudo-cron.
+		'run_via_cron' => true,			//Run it hourly via ClassicPress pseudo-cron.
         
         'mark_broken_links' => true, 	//Whether to add the broken_link class to broken links in posts.
         'broken_link_css' => ".broken_link, a.broken_link {\n\ttext-decoration: line-through;\n}",

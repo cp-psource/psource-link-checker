@@ -2417,7 +2417,7 @@ class wsBrokenLinkChecker {
 		//Close the session to prevent lock-ups.
 		//PHP sessions are blocking. session_start() will wait until all other scripts that are using the same session
 		//are finished. As a result, a long-running script that unintentionally keeps the session open can cause
-		//the entire site to "lock up" for the current user/browser. WordPress itself doesn't use sessions, but some
+		//the entire site to "lock up" for the current user/browser. ClassicPress itself doesn't use sessions, but some
 		//plugins do, so we should explicitly close the session (if any) before starting the worker.
 		if ( session_id() != '' ) {
 			session_write_close();
