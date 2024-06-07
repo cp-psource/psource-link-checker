@@ -136,10 +136,10 @@ jQuery(function($){
 	}
 
 	blcToggleLogOptions();
-	$('#logging_enabled').change(blcToggleLogOptions);
+	$('#logging_enabled').on('change', blcToggleLogOptions);
 
 	//
-	$('#target_resource_usage').change(function() {
+	$('#target_resource_usage').on('change', function() {
 		$('#target_resource_usage_percent').text($(this).val() + '%')
 	});
 });

@@ -835,7 +835,7 @@ jQuery(function($){
 	var failure_duration_threshold_input = $('#failure_duration_threshold');
 	
     //Apply/remove highlights when the checkbox is (un)checked
-    highlight_permanent_failures_checkbox.change(function(){
+    highlight_permanent_failures_checkbox.on('change', function(){
     	//save_highlight_settings();
     	
 		if ( this.checked ){
@@ -846,7 +846,7 @@ jQuery(function($){
 	});
 	
 	//Apply/remove highlights when the duration threshold is changed.
-	failure_duration_threshold_input.change(function(){
+	failure_duration_threshold_input.on('change', function(){
 		var new_threshold = parseInt($(this).val());
 		//save_highlight_settings();
 		if (isNaN(new_threshold) || (new_threshold < 1)) {
@@ -869,7 +869,7 @@ jQuery(function($){
 	});
 	
 	//Show/hide table columns dynamically
-	$('#blc-column-selector input[type="checkbox"]').change(function(){
+	$('#blc-column-selector input[type="checkbox"]').on('change', function(){
 		var checkbox = $(this);
 		var column_id = checkbox.attr('name').split(/\[|\]/)[1];
 		if (checkbox.is(':checked')){
