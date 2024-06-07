@@ -46,7 +46,7 @@ jQuery(function($){
 	
 	var toggleButton = $('#blc-debug-info-toggle'); 
 	
-	toggleButton.click(function(){
+	toggleButton.on('click', function(){
 		
 		var box = $('#blc-debug-info'); 
 		box.toggle();
@@ -58,7 +58,7 @@ jQuery(function($){
 		
 	});
 	
-	$('#toggle-broken-link-css-editor').click(function(){
+	$('#toggle-broken-link-css-editor').on('click', function(){
 		var box = $('#broken-link-css-wrap').toggleClass('hidden');
 		
 		$.cookie(
@@ -72,7 +72,7 @@ jQuery(function($){
 		return false;
 	});
 	
-	$('#toggle-removed-link-css-editor').click(function(){
+	$('#toggle-removed-link-css-editor').on('click', function(){
 		var box = $('#removed-link-css-wrap').toggleClass('hidden');
 		
 		$.cookie(
@@ -87,7 +87,7 @@ jQuery(function($){
 	});
 	
 	//Show/hide per-module settings
-	$('.toggle-module-settings').click(function(){
+	$('.toggle-module-settings').on('click', function(){
 		var settingsBox = $(this).parent().find('.module-extra-settings');
 		if ( settingsBox.length > 0 ){
 			settingsBox.toggleClass('hidden');
@@ -104,7 +104,7 @@ jQuery(function($){
 	
 	//When the user ticks the "Custom fields" box, display the field list input
 	//so that they notice that they need to enter the field names. 
-	$('#module-checkbox-custom_field').click(function(){
+	$('#module-checkbox-custom_field').on('click', function(){
 		var box = $(this);
 		var fieldList = $('#blc_custom_fields');
 		if ( box.is(':checked') && ( $.trim(fieldList.val()) == '' ) ){
@@ -114,7 +114,7 @@ jQuery(function($){
 
 	//When the user ticks the "Custom fields" box, display the field list input
 	//so that they notice that they need to enter the field names.
-	$('#module-checkbox-acf_field').click(function(){
+	$('#module-checkbox-acf_field').on('click', function(){
 		var box = $(this);
 		var fieldList = $('#blc_acf_fields');
 		if ( box.is(':checked') && ( $.trim(fieldList.val()) == '' ) ){
@@ -123,7 +123,7 @@ jQuery(function($){
 	});
 	
 	//Handle the "Recheck" button
-	$('#start-recheck').click(function(){
+	$('#start-recheck').on('click', function(){
 		$('#recheck').val('1'); //populate the hidden field
 		$('#link_checker_options input[name="submit"]').click(); //.submit() didn't work for some reason	
 	});

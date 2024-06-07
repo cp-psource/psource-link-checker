@@ -54,7 +54,7 @@ function reloadDetailsRow(link_id){
 jQuery(function($){
 	
 	//The details button - display/hide detailed info about a link
-    $(".blc-details-button, td.column-link-text, td.column-status, td.column-new-link-text").click(function () {
+    $(".blc-details-button, td.column-link-text, td.column-status, td.column-new-link-text").on('click', function () {
     	var master = $(this).parents('.blc-row');
     	var link_id = master.attr('id').split('-')[2];
 		$('#link-details-'+link_id).toggle();
@@ -64,7 +64,7 @@ jQuery(function($){
 	var ajaxInProgressHtml = '<?php echo esc_js(__('Warte...', 'psource-link-checker')); ?>';
 	
 	//The "Not broken" button - manually mark the link as valid. The link will be checked again later.
-	$(".blc-discard-button").click(function () {
+	$(".blc-discard-button").on('click', function () {
 		var me = $(this);
 		me.html(ajaxInProgressHtml);
 		
@@ -118,7 +118,7 @@ jQuery(function($){
     });
 
 	//The "Dismiss" button - hide the link from the "Broken" and "Redirects" filters, but still apply link tweaks and so on.
-	$(".blc-dismiss-button").click(function () {
+	$(".blc-dismiss-button").on('click', function () {
 		var me = $(this);
 		var oldButtonHtml = me.html();
 		me.html(ajaxInProgressHtml);
@@ -165,7 +165,7 @@ jQuery(function($){
 	});
 
 	//The "Undismiss" button.
-	$(".blc-undismiss-button").click(function () {
+	$(".blc-undismiss-button").on('click', function () {
 		var me = $(this);
 		var oldButtonHtml = me.html();
 		me.html(ajaxInProgressHtml);
@@ -211,7 +211,7 @@ jQuery(function($){
 	});
 
 	//The "Recheck" button.
-	$(".blc-recheck-button").click(function () {
+	$(".blc-recheck-button").on('click', function () {
 		var me = $(this);
 		var oldButtonHtml = me.html();
 		me.html(ajaxInProgressHtml);
@@ -248,7 +248,7 @@ jQuery(function($){
 	});
 
 	//The "Fix redirect" action.
-	$('.blc-deredirect-button').click(function() {
+	$('.blc-deredirect-button').on('click', function() {
 		//This action can only be used once. If it succeeds, it will no longer be applicable to the current link.
 		//If it fails, something is broken and trying again probably won't help.
 		var me = $(this);
@@ -583,7 +583,7 @@ jQuery(function($){
 	}
 
     //The "Edit URL" button - displays the inline editor
-    $(".blc-edit-button").click(function () {
+    $(".blc-edit-button").on('click', function () {
 		var master = $(this).closest('.blc-row');
     	var link_id = master.attr('id').split('-')[2];
         showLinkEditor(link_id);
@@ -604,7 +604,7 @@ jQuery(function($){
 
 
 	//The "Update" button in the inline editor.
-	$('.blc-update-link-button').click(function() {
+	$('.blc-update-link-button').on('click', function() {
 		var editRow = $(this).closest('tr'),
 			master = editRow.prev('.blc-row');
 
@@ -632,7 +632,7 @@ jQuery(function($){
 	});
 
     //The "Cancel" in the inline editor.
-    $(".blc-cancel-button").click(function () { 
+    $(".blc-cancel-button").on('click', function () { 
 		var editRow = $(this).closest('tr');
 		hideLinkEditor(editRow);
     });
@@ -647,7 +647,7 @@ jQuery(function($){
 
 
     //The "Unlink" button - remove the link/image from all posts, custom fields, etc.
-    $(".blc-unlink-button").click(function () { 
+    $(".blc-unlink-button").on('click', function () { 
     	var me = this;
     	var master = $(me).parents('.blc-row');
 		$(me).html('<?php echo esc_js(__('Warte...' , 'psource-link-checker')); ?>');
@@ -727,7 +727,7 @@ jQuery(function($){
 		resizable: false
 	});
 
-    $('#blc-open-search-box').click(function(){
+    $('#blc-open-search-box').on('click', function(){
     	if ( searchForm.dialog('isOpen') ){
 			searchForm.dialog('close');
 		} else {
@@ -742,12 +742,12 @@ jQuery(function($){
 		}
 	});
 	
-	$('#blc-cancel-search').click(function(){
+	$('#blc-cancel-search').on('click', function(){
 		searchForm.dialog('close');
 	});
 	
 	//The "Save This Search Query" button creates a new custom filter based on the current search
-	$('#blc-create-filter').click(function(){
+	$('#blc-create-filter').on('click', function(){
 		var filter_name = prompt("<?php echo esc_js(__("Gib einen Namen für den neuen benutzerdefinierten Filter ein", 'psource-link-checker')); ?>", "");
 		if ( filter_name ){
 			$('#blc-custom-filter-name').val(filter_name);
@@ -756,7 +756,7 @@ jQuery(function($){
 	});
 	
 	//Display a confirmation dialog when the user clicks the "Delete This Filter" button 
-	$('#blc-delete-filter').click(function(){
+	$('#blc-delete-filter').on('click', function(){
 		var message = '<?php
 		echo esc_js(
 			html_entity_decode(
@@ -888,7 +888,7 @@ jQuery(function($){
 	
 	//Unlike other fields in "Screen Options", the links-per-page setting 
 	//is handled using straight form submission (POST), not AJAX.
-	$('#blc-per-page-apply-button').click(function(){
+	$('#blc-per-page-apply-button').on('click', function(){
 		$('#adv-settings').submit();	
 	});
 	
@@ -899,7 +899,7 @@ jQuery(function($){
 	});
 	
 	//Toggle status code colors when the corresponding checkbox is toggled
-	$('#table_color_code_status').click(function(){
+	$('#table_color_code_status').on('click', function(){
 		if ( $(this).is(':checked') ){
 			$('#blc-links').addClass('color-code-link-status');
 		} else {
@@ -908,7 +908,7 @@ jQuery(function($){
 	});
 	
 	//Show the bulk edit/find & replace form when the user applies the appropriate bulk action 
-	$('#doaction, #doaction2').click(function(e){
+	$('#doaction, #doaction2').on('click', function(e){
 		var n = $(this).attr('id').substr(2);
 		if ( $('select[name="'+n+'"]').val() == 'bulk-edit' ) {
 			e.preventDefault();
@@ -920,13 +920,13 @@ jQuery(function($){
 	});
 	
 	//Hide the bulk edit/find & replace form when "Cancel" is clicked
-	$('#bulk-edit .cancel').click(function(){
+	$('#bulk-edit .cancel').on('click', function(){
 		$('#bulk-edit').hide();
 		return false;
 	});
 	
 	//Minimal input validation for the bulk edit form
-	$('#bulk-edit input[type="submit"]').click(function(e){
+	$('#bulk-edit input[type="submit"]').on('click', function(e){
 		if( $('#bulk-edit input[name="search"]').val() == '' ){
 			alert('<?php echo esc_js(__('Gib zuerst eine Suchzeichenfolge ein.', 'psource-link-checker')); ?>');
 			$('#bulk-edit input[name="search"]').focus();
