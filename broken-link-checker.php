@@ -1,11 +1,11 @@
 <?php
 /*
- * Plugin Name: PS Broken Link Checker
- * Plugin URI:  https://n3rds.work/shop/artikel/defekter-link-checker-plugin/
+ * Plugin Name: Link Checker
+ * Plugin URI:  https://cp-psource.github.io/psource-link-checker/
  * Description: Überprüft Deine Seite auf fehlerhafte Links und fehlende Bilder und benachrichtigt Dich im Dashboard, falls gefunden.
  * Version:     1.0.7
  * Author:      PSOURCE
- * Author URI:  https://n3rds.work
+ * Author URI:  https://github.com/cp-psource
  * Text Domain: psource-link-checker
  * Domain Path: languages
  * License:     GPLv2 or later
@@ -27,17 +27,25 @@ You should have received a copy of the GNU General Public License
 along with Broken Link Checker. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
 */
 
+/**
+ * @@@@@@@@@@@@@@@@@ PS UPDATER 1.3 @@@@@@@@@@@
+ **/
 require 'psource/psource-plugin-update/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
-
+ 
 $myUpdateChecker = PucFactory::buildUpdateChecker(
 	'https://github.com/cp-psource/psource-link-checker',
 	__FILE__,
 	'psource-link-checker'
 );
-
+ 
 //Set the branch that contains the stable release.
 $myUpdateChecker->setBranch('master');
+
+/**
+ * @@@@@@@@@@@@@@@@@ ENDE PS UPDATER 1.3 @@@@@@@@@@@
+ **/
+
 
 //Path to this file
 if ( !defined('BLC_PLUGIN_FILE') ){

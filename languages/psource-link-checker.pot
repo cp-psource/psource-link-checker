@@ -2018,7 +2018,7 @@ msgid "PS Broken Link Checker"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
-msgid "https://n3rds.work/shop/artikel/defekter-link-checker-plugin/"
+msgid "https://github.com/cp-psource/shop/artikel/defekter-link-checker-plugin/"
 msgstr ""
 
 #. Description of the plugin/theme
@@ -2032,5 +2032,5 @@ msgid "PSOURCE"
 msgstr ""
 
 #. Author URI of the plugin/theme
-msgid "https://n3rds.work"
+msgid "https://github.com/cp-psource"
 msgstr ""

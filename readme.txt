@@ -1,8 +1,8 @@
 === PS Broken Link Checker ===
 
-Plugin URI:  https://n3rds.work/shop/artikel/defekter-link-checker-plugin/
+Plugin URI:  https://github.com/cp-psource/shop/artikel/defekter-link-checker-plugin/
 Contributors: DerN3rd
-Donate link: https://n3rds.work/piestingtalfunding/unterstuetze-unsere-psource-free-werke/
+Donate link: https://github.com/cp-psource/piestingtalfunding/unterstuetze-unsere-psource-free-werke/
 Tags: links, broken, detect, seo, usability, classicpress-plugin
 Requires at least: 4.9
 Tested up to: 5.6
@@ -77,7 +77,7 @@ Several actions are assigned to each link. They will appear when you hover over 
 
 You can also click the contents of the "Status" or "Link Text" columns for more information about the status of each link.
 
-[POWERED BY PSOURCE](https://n3rds.work/psource_kategorien/cp-powersource/)
+[POWERED BY PSOURCE](https://github.com/cp-psource/psource_kategorien/cp-powersource/)
 
 == Languages ==
 
@@ -96,32 +96,32 @@ Use the opportunity to do so on GitHub or send your files to: webmaster@n3rds.wo
 
 = Finde mehr CP-Powersource =
 
-Wirf einen Blick in unser [PSOURCE Sortiment](https://n3rds.work/psource_kategorien/cp-powersource/) und hole noch mehr aus Deinem ClassicPress!
+Wirf einen Blick in unser [PSOURCE Sortiment](https://github.com/cp-psource/psource_kategorien/cp-powersource/) und hole noch mehr aus Deinem ClassicPress!
 
-Halte Dich mit unserem [Newsletter](https://n3rds.work/webmasterservice-n3rdswork-digalize-das-piestingtal/newsletter-management/) über unsere CP-Powersource informiert!
+Halte Dich mit unserem [Newsletter](https://github.com/cp-psource/webmasterservice-n3rdswork-digalize-das-piestingtal/newsletter-management/) über unsere CP-Powersource informiert!
 
 = Unterstütze PSOURCE =
 
 Viele, viele Kaffees konsumieren wir während wir an unseren Plugins und Themes arbeiten.
 Wie wärs? Möchtest Du uns mit einer Kaffee-Spende bei der Arbeit an unseren Plugins unterstützen?
 
-Mach eine [Spende per Überweisung oder PayPal](https://n3rds.work/spendenaktionen/unterstuetze-unsere-psource-free-werke/) wir Danken Dir!
+Mach eine [Spende per Überweisung oder PayPal](https://github.com/cp-psource/spendenaktionen/unterstuetze-unsere-psource-free-werke/) wir Danken Dir!
 
 
 = ENGLISH =
 
 = Find more CP-Powersource =
 
-Take a look at our [PSOURCE range](https://n3rds.work/psource_categories/cp-powersource/) and get even more out of your ClassicPress!
+Take a look at our [PSOURCE range](https://github.com/cp-psource/psource_categories/cp-powersource/) and get even more out of your ClassicPress!
 
-Keep yourself informed about our CP-Powersource with our [Newsletter](https://n3rds.work/webmasterservice-n3rdswork-digalize-das-piestingtal/newsletter-management/)!
+Keep yourself informed about our CP-Powersource with our [Newsletter](https://github.com/cp-psource/webmasterservice-n3rdswork-digalize-das-piestingtal/newsletter-management/)!
 
 = Support PSOURCE =
 
 We consume many, many coffees while working on our plugins and themes.
 how about Would you like to support us with a coffee donation while working on our plugins?
 
-Make a [donation by bank transfer or PayPal](https://n3rds.work/spenderaktionen/unterstuetze-unsere-psource-free-werke/) we thank you!
+Make a [donation by bank transfer or PayPal](https://github.com/cp-psource/spenderaktionen/unterstuetze-unsere-psource-free-werke/) we thank you!
 
 == ChangeLog ==
 
