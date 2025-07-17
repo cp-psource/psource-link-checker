@@ -38,50 +38,50 @@ class wsBrokenLinkChecker {
 	function __construct ( $loader, $conf ) {
 		$this->db_version = BLC_DATABASE_VERSION;
 
-        $this->conf = $conf;
-        $this->loader = $loader;
-        $this->my_basename = plugin_basename( $this->loader );
+		$this->conf = $conf;
+		$this->loader = $loader;
+		$this->my_basename = plugin_basename( $this->loader );
 
-        $this->load_language();
+		$this->load_language();
 
-        //Unlike the activation hook, the deactivation callback *can* be registered in this file
-        //because deactivation happens after this class has already been instantiated (durinng the
+		//Unlike the activation hook, the deactivation callback *can* be registered in this file
+		//because deactivation happens after this class has already been instantiated (durinng the
 		//'init' action).
-        register_deactivation_hook($loader, array($this, 'deactivation'));
+		register_deactivation_hook($loader, array($this, 'deactivation'));
 
-        add_action('admin_menu', array($this,'admin_menu'));
+		add_action('admin_menu', array($this,'admin_menu'));
 
 		//Load jQuery on Dashboard pages (probably redundant as WP already does that)
-        add_action('admin_print_scripts', array($this,'admin_print_scripts'));
+		add_action('admin_print_scripts', array($this,'admin_print_scripts'));
 
-        //The dashboard widget
-        add_action('wp_dashboard_setup', array($this, 'hook_wp_dashboard_setup'));
+		//The dashboard widget
+		add_action('wp_dashboard_setup', array($this, 'hook_wp_dashboard_setup'));
 
-        //AJAXy hooks
-        add_action( 'wp_ajax_blc_full_status', array($this,'ajax_full_status') );
-        add_action( 'wp_ajax_blc_dashboard_status', array($this,'ajax_dashboard_status') );
-        add_action( 'wp_ajax_blc_work', array($this,'ajax_work') );
-        add_action( 'wp_ajax_blc_discard', array($this,'ajax_discard') );
-        add_action( 'wp_ajax_blc_edit', array($this,'ajax_edit') );
-        add_action( 'wp_ajax_blc_link_details', array($this,'ajax_link_details') );
-        add_action( 'wp_ajax_blc_unlink', array($this,'ajax_unlink') );
-        add_action( 'wp_ajax_blc_recheck', array($this,'ajax_recheck') );
-        add_action( 'wp_ajax_blc_deredirect', array($this,'ajax_deredirect') );
-        add_action( 'wp_ajax_blc_current_load', array($this,'ajax_current_load') );
+		//AJAXy hooks
+		add_action( 'wp_ajax_blc_full_status', array($this,'ajax_full_status') );
+		add_action( 'wp_ajax_blc_dashboard_status', array($this,'ajax_dashboard_status') );
+		add_action( 'wp_ajax_blc_work', array($this,'ajax_work') );
+		add_action( 'wp_ajax_blc_discard', array($this,'ajax_discard') );
+		add_action( 'wp_ajax_blc_edit', array($this,'ajax_edit') );
+		add_action( 'wp_ajax_blc_link_details', array($this,'ajax_link_details') );
+		add_action( 'wp_ajax_blc_unlink', array($this,'ajax_unlink') );
+		add_action( 'wp_ajax_blc_recheck', array($this,'ajax_recheck') );
+		add_action( 'wp_ajax_blc_deredirect', array($this,'ajax_deredirect') );
+		add_action( 'wp_ajax_blc_current_load', array($this,'ajax_current_load') );
 
-	    add_action( 'wp_ajax_blc_dismiss', array($this, 'ajax_dismiss') );
-	    add_action( 'wp_ajax_blc_undismiss', array($this, 'ajax_undismiss') );
+		add_action( 'wp_ajax_blc_dismiss', array($this, 'ajax_dismiss') );
+		add_action( 'wp_ajax_blc_undismiss', array($this, 'ajax_undismiss') );
 
-        //Add/remove Cron events
-        $this->setup_cron_events();
+		//Add/remove Cron events
+		$this->setup_cron_events();
 
-        //Set hooks that listen for our Cron actions
-    	add_action( 'blc_cron_email_notifications', array( $this, 'maybe_send_email_notifications' ) );
+		//Set hooks that listen for our Cron actions
+		add_action( 'blc_cron_email_notifications', array( $this, 'maybe_send_email_notifications' ) );
 		add_action( 'blc_cron_check_links', array( $this, 'cron_check_links' ) );
 		add_action( 'blc_cron_database_maintenance', array( $this, 'database_maintenance' ) );
 
-        //Set the footer hook that will call the worker function via AJAX.
-        add_action( 'admin_footer', array( $this,'admin_footer' ) );
+		//Set the footer hook that will call the worker function via AJAX.
+		add_action( 'admin_footer', array( $this,'admin_footer' ) );
 		//Add a "Screen Options" panel to the "Broken Links" page
 		add_screen_options_panel(
 			'blc-screen-options',
@@ -96,22 +96,22 @@ class wsBrokenLinkChecker {
 		add_action( 'admin_notices', array( $this, 'show_warnings_section_notice' ) );
 
 
-    }
+	}
 
   /**
    * Output the script that runs the link monitor while the Dashboard is open.
    *
    * @return void
    */
-    function admin_footer(){
-    	if ( !$this->conf->options['run_in_dashboard'] ){
+	function admin_footer(){
+		if ( !$this->conf->options['run_in_dashboard'] ){
 			return;
 		}
 		$nonce = wp_create_nonce('blc_work');
-        ?>
-        <!-- wsblc admin footer -->
-        <script type='text/javascript'>
-        (function($){
+		?>
+		<!-- wsblc admin footer -->
+		<script type='text/javascript'>
+		(function($){
 
 			//(Re)starts the background worker thread
 			function blcDoWork(){
@@ -130,10 +130,10 @@ class wsBrokenLinkChecker {
 			setInterval(blcDoWork, <?php echo (intval($this->conf->options['max_execution_time']) + 1 )*1000; ?>);
 
 		})(jQuery);
-        </script>
-        <!-- /wsblc admin footer -->
-        <?php
-    }
+		</script>
+		<!-- /wsblc admin footer -->
+		<?php
+	}
 
   /**
    * Check if an URL matches the exclusion list.
@@ -141,22 +141,22 @@ class wsBrokenLinkChecker {
    * @param string $url
    * @return bool
    */
-    function is_excluded($url){
-        if (!is_array($this->conf->options['exclusion_list'])) return false;
-        foreach($this->conf->options['exclusion_list'] as $excluded_word){
-            if (stristr($url, $excluded_word)){
-                return true;
-            }
-        }
-        return false;
-    }
+	function is_excluded($url){
+		if (!is_array($this->conf->options['exclusion_list'])) return false;
+		foreach($this->conf->options['exclusion_list'] as $excluded_word){
+			if (stristr($url, $excluded_word)){
+				return true;
+			}
+		}
+		return false;
+	}
 
-    function dashboard_widget(){
-        ?>
-        <p id='wsblc_activity_box'><?php _e( 'Lade...', 'psource-link-checker' );  ?></p>
-        <script type='text/javascript'>
-        	jQuery( function($){
-        		var blc_was_autoexpanded = false;
+	function dashboard_widget(){
+		?>
+		<p id='wsblc_activity_box'><?php _e( 'Lade...', 'psource-link-checker' );  ?></p>
+		<script type='text/javascript'>
+			jQuery( function($){
+				var blc_was_autoexpanded = false;
 
 				function blcDashboardStatus(){
 					$.getJSON(
@@ -188,11 +188,11 @@ class wsBrokenLinkChecker {
 				blcDashboardStatus();//Call it the first time
 
 			} );
-        </script>
-        <?php
-    }
+		</script>
+		<?php
+	}
 
-    function dashboard_widget_control(
+	function dashboard_widget_control(
 		/** @noinspection PhpUnusedParameterInspection */ $widget_id, $form_inputs = array()
 	){
 		if ( 'POST' == $_SERVER['REQUEST_METHOD'] && 'blc_dashboard_widget' == $_POST['widget_id'] ) {
@@ -207,26 +207,26 @@ class wsBrokenLinkChecker {
 			<?php _e('Erweitere das Widget automatisch, wenn defekte Links erkannt wurden', 'psource-link-checker'); ?>
 		</label></p>
 		<?php
-    }
+	}
 
-    function admin_print_scripts(){
-        //jQuery is used for triggering the link monitor via AJAX when any admin page is open.
-        wp_enqueue_script('jquery');
-    }
+	function admin_print_scripts(){
+		//jQuery is used for triggering the link monitor via AJAX when any admin page is open.
+		wp_enqueue_script('jquery');
+	}
 
-    function enqueue_settings_scripts(){
-    	//jQuery UI is used on the settings page
+	function enqueue_settings_scripts(){
+		//jQuery UI is used on the settings page
 		wp_enqueue_script('jquery-ui-core');   //Used for background color animation
-        wp_enqueue_script('jquery-ui-dialog');
-        wp_enqueue_script('jquery-ui-tabs');
-        wp_enqueue_script('jquery-cookie', plugins_url('js/jquery.cookie.js', BLC_PLUGIN_FILE)); //Used for storing last widget states, etc
+		wp_enqueue_script('jquery-ui-dialog');
+		wp_enqueue_script('jquery-ui-tabs');
+		wp_enqueue_script('jquery-cookie', plugins_url('js/jquery.cookie.js', BLC_PLUGIN_FILE)); //Used for storing last widget states, etc
 	}
 
 	function enqueue_link_page_scripts(){
 		wp_enqueue_script('jquery-ui-core');
-        wp_enqueue_script('jquery-ui-dialog'); //Used for the search form
+		wp_enqueue_script('jquery-ui-dialog'); //Used for the search form
 		wp_enqueue_script('jquery-color');     //Used for background color animation
-        wp_enqueue_script('sprintf', plugins_url('js/sprintf.js', BLC_PLUGIN_FILE)); //Used in error messages
+		wp_enqueue_script('sprintf', plugins_url('js/sprintf.js', BLC_PLUGIN_FILE)); //Used in error messages
 	}
 
   /**
@@ -234,17 +234,17 @@ class wsBrokenLinkChecker {
    *
    * @return void
    */
-    function initiate_recheck(){
-    	global $wpdb; /** @var wpdb $wpdb */
+	function initiate_recheck(){
+		global $wpdb; /** @var wpdb $wpdb */
 
-    	//Delete all discovered instances
-    	$wpdb->query("TRUNCATE {$wpdb->prefix}blc_instances");
+		//Delete all discovered instances
+		$wpdb->query("TRUNCATE {$wpdb->prefix}blc_instances");
 
-    	//Delete all discovered links
-    	$wpdb->query("TRUNCATE {$wpdb->prefix}blc_links");
+		//Delete all discovered links
+		$wpdb->query("TRUNCATE {$wpdb->prefix}blc_links");
 
-    	//Mark all posts, custom fields and bookmarks for processing.
-    	blc_resynch(true);
+		//Mark all posts, custom fields and bookmarks for processing.
+		blc_resynch(true);
 	}
 
   /**
@@ -252,8 +252,8 @@ class wsBrokenLinkChecker {
    *
    * @return void
    */
-    function deactivation(){
-    	//Remove our Cron events
+	function deactivation(){
+		//Remove our Cron events
 		wp_clear_scheduled_hook('blc_cron_check_links');
 		wp_clear_scheduled_hook('blc_cron_email_notifications');
 		wp_clear_scheduled_hook('blc_cron_database_maintenance');
@@ -284,21 +284,21 @@ class wsBrokenLinkChecker {
 		blcUtility::optimize_database();
 	}
 
-    /**
-     * Create the plugin's menu items and enqueue their scripts and CSS.
-     * Callback for the 'admin_menu' action.
-     *
-     * @return void
-     */
-    function admin_menu(){
-    	if (current_user_can('manage_options'))
-          add_filter('plugin_action_links', array($this, 'plugin_action_links'), 10, 2);
+	/**
+	 * Create the plugin's menu items and enqueue their scripts and CSS.
+	 * Callback for the 'admin_menu' action.
+	 *
+	 * @return void
+	 */
+	function admin_menu(){
+		if (current_user_can('manage_options'))
+		  add_filter('plugin_action_links', array($this, 'plugin_action_links'), 10, 2);
 
-        $options_page_hook = add_options_page(
+		$options_page_hook = add_options_page(
 			__('Link Checker Einstellungen', 'psource-link-checker'),
 			__('Link Checker', 'psource-link-checker'),
 			'manage_options',
-            'link-checker-settings',array($this, 'options_page')
+			'link-checker-settings',array($this, 'options_page')
 		);
 
 		$menu_title = __('Defekte Links', 'psource-link-checker');
@@ -316,28 +316,28 @@ class wsBrokenLinkChecker {
 				);
 			}
 		}
-        $links_page_hook = add_management_page(
+		$links_page_hook = add_management_page(
 			__('Defekte Links anzeigen', 'psource-link-checker'),
 			$menu_title,
 			'edit_others_posts',
-            'view-broken-links',array($this, 'links_page')
+			'view-broken-links',array($this, 'links_page')
 		);
 
 		//Add plugin-specific scripts and CSS only to the it's own pages
 		add_action( 'admin_print_styles-' . $options_page_hook, array($this, 'options_page_css') );
-        add_action( 'admin_print_styles-' . $links_page_hook, array($this, 'links_page_css') );
+		add_action( 'admin_print_styles-' . $links_page_hook, array($this, 'links_page_css') );
 		add_action( 'admin_print_scripts-' . $options_page_hook, array($this, 'enqueue_settings_scripts') );
-        add_action( 'admin_print_scripts-' . $links_page_hook, array($this, 'enqueue_link_page_scripts') );
+		add_action( 'admin_print_scripts-' . $links_page_hook, array($this, 'enqueue_link_page_scripts') );
 
-	    //Make the Settings page link to the link list
+		//Make the Settings page link to the link list
 		add_screen_meta_link(
-        	'blc-links-page-link',
+			'blc-links-page-link',
 			__('Gehe zu Defekten Links', 'psource-link-checker'),
 			admin_url('tools.php?page=view-broken-links'),
 			$options_page_hook,
 			array('style' => 'font-weight: bold;')
 		);
-    }
+	}
 
   /**
    * plugin_action_links()
@@ -348,35 +348,35 @@ class wsBrokenLinkChecker {
    * @param string $file
    * @return array
    */
-    function plugin_action_links($links, $file) {
-        if ($file == $this->my_basename)
-            $links[] = "<a href='options-general.php?page=link-checker-settings'>" . __('Settings') . "</a>";
-        return $links;
-    }
+	function plugin_action_links($links, $file) {
+		if ($file == $this->my_basename)
+			$links[] = "<a href='options-general.php?page=link-checker-settings'>" . __('Settings') . "</a>";
+		return $links;
+	}
 
-    function options_page(){
-    	$moduleManager = blcModuleManager::getInstance();
+	function options_page(){
+		$moduleManager = blcModuleManager::getInstance();
 
-	    //Prior to 1.5.2 (released 2012-05-27), there was a bug that would cause the donation flag to be
-	    //set incorrectly. So we'll unset the flag in that case.
-	    $reset_donation_flag =
-	    	($this->conf->get('first_installation_timestamp', 0) < strtotime('2012-05-27 00:00')) &&
-	    	!$this->conf->get('donation_flag_fixed', false);
+		//Prior to 1.5.2 (released 2012-05-27), there was a bug that would cause the donation flag to be
+		//set incorrectly. So we'll unset the flag in that case.
+		$reset_donation_flag =
+			($this->conf->get('first_installation_timestamp', 0) < strtotime('2012-05-27 00:00')) &&
+			!$this->conf->get('donation_flag_fixed', false);
 
-	    if ( $reset_donation_flag) {
-		    $this->conf->set('user_has_donated', false);
-		    $this->conf->set('donation_flag_fixed', true);
-		    $this->conf->save_options();
-	    }
+		if ( $reset_donation_flag) {
+			$this->conf->set('user_has_donated', false);
+			$this->conf->set('donation_flag_fixed', true);
+			$this->conf->save_options();
+		}
 
-        if (isset($_POST['recheck']) && !empty($_POST['recheck']) ){
-            $this->initiate_recheck();
+		if (isset($_POST['recheck']) && !empty($_POST['recheck']) ){
+			$this->initiate_recheck();
 
-            //Redirect back to the settings page
+			//Redirect back to the settings page
 			$base_url = remove_query_arg( array('_wpnonce', 'noheader', 'updated', 'error', 'action', 'message') );
 			wp_redirect( add_query_arg( array( 'recheck-initiated' => true), $base_url ) );
 			die();
-        }
+		}
 
 		$available_link_actions = array(
 			'edit'               => __('URL bearbeiten' , 'psource-link-checker'),
@@ -387,7 +387,7 @@ class wsBrokenLinkChecker {
 			'blc-deredirect-action' => _x('Umleitung korrigieren', 'link action; Ersetze eine Weiterleitung durch einen direkten Link', 'psource-link-checker')
 		);
 
-        if(isset($_POST['submit'])) {
+		if(isset($_POST['submit'])) {
 			check_admin_referer('link-checker-options');
 
 			$cleanPost = $_POST;
@@ -421,30 +421,30 @@ class wsBrokenLinkChecker {
 			$this->conf->options['enabled_post_statuses'] = $enabled_post_statuses;
 
 			//The execution time limit must be above zero
-            $new_execution_time = intval($_POST['max_execution_time']);
-            if( $new_execution_time > 0 ){
-                $this->conf->options['max_execution_time'] = $new_execution_time;
-            }
+			$new_execution_time = intval($_POST['max_execution_time']);
+			if( $new_execution_time > 0 ){
+				$this->conf->options['max_execution_time'] = $new_execution_time;
+			}
 
 			//The check threshold also must be > 0
-            $new_check_threshold=intval($_POST['check_threshold']);
-            if( $new_check_threshold > 0 ){
-                $this->conf->options['check_threshold'] = $new_check_threshold;
-            }
+			$new_check_threshold=intval($_POST['check_threshold']);
+			if( $new_check_threshold > 0 ){
+				$this->conf->options['check_threshold'] = $new_check_threshold;
+			}
 
-            $this->conf->options['mark_broken_links'] = !empty($_POST['mark_broken_links']);
-            $new_broken_link_css = trim($cleanPost['broken_link_css']);
-            $this->conf->options['broken_link_css'] = $new_broken_link_css;
+			$this->conf->options['mark_broken_links'] = !empty($_POST['mark_broken_links']);
+			$new_broken_link_css = trim($cleanPost['broken_link_css']);
+			$this->conf->options['broken_link_css'] = $new_broken_link_css;
 
-            $this->conf->options['mark_removed_links'] = !empty($_POST['mark_removed_links']);
-            $new_removed_link_css = trim($cleanPost['removed_link_css']);
-            $this->conf->options['removed_link_css'] = $new_removed_link_css;
+			$this->conf->options['mark_removed_links'] = !empty($_POST['mark_removed_links']);
+			$new_removed_link_css = trim($cleanPost['removed_link_css']);
+			$this->conf->options['removed_link_css'] = $new_removed_link_css;
 
-            $this->conf->options['nofollow_broken_links'] = !empty($_POST['nofollow_broken_links']);
+			$this->conf->options['nofollow_broken_links'] = !empty($_POST['nofollow_broken_links']);
 
-            $this->conf->options['suggestions_enabled'] = !empty($_POST['suggestions_enabled']);
+			$this->conf->options['suggestions_enabled'] = !empty($_POST['suggestions_enabled']);
 
-            $this->conf->options['exclusion_list'] = array_filter(
+			$this->conf->options['exclusion_list'] = array_filter(
 				preg_split(
 					'/[\s\r\n]+/',				//split on newlines and whitespace
 					$cleanPost['exclusion_list'],
@@ -453,25 +453,25 @@ class wsBrokenLinkChecker {
 				)
 			);
 
-            //Parse the custom field list
-            $new_custom_fields = array_filter(
+			//Parse the custom field list
+			$new_custom_fields = array_filter(
 				preg_split( '/[\r\n]+/', $cleanPost['blc_custom_fields'], -1, PREG_SPLIT_NO_EMPTY )
 			);
 
 			//Calculate the difference between the old custom field list and the new one (used later)
-            $diff1 = array_diff( $new_custom_fields, $this->conf->options['custom_fields'] );
-            $diff2 = array_diff( $this->conf->options['custom_fields'], $new_custom_fields );
-            $this->conf->options['custom_fields'] = $new_custom_fields;
+			$diff1 = array_diff( $new_custom_fields, $this->conf->options['custom_fields'] );
+			$diff2 = array_diff( $this->conf->options['custom_fields'], $new_custom_fields );
+			$this->conf->options['custom_fields'] = $new_custom_fields;
 
-            //Parse the custom field list
-            $new_acf_fields = array_filter(preg_split('/[\r\n]+/', $cleanPost['blc_acf_fields'], -1, PREG_SPLIT_NO_EMPTY));
+			//Parse the custom field list
+			$new_acf_fields = array_filter(preg_split('/[\r\n]+/', $cleanPost['blc_acf_fields'], -1, PREG_SPLIT_NO_EMPTY));
 
-            //Calculate the difference between the old custom field list and the new one (used later)
-            $acf_fields_diff1 = array_diff($new_acf_fields, $this->conf->options['acf_fields']);
-            $acf_fields_diff2 = array_diff($this->conf->options['acf_fields'], $new_acf_fields);
-            $this->conf->options['acf_fields'] = $new_acf_fields;
+			//Calculate the difference between the old custom field list and the new one (used later)
+			$acf_fields_diff1 = array_diff($new_acf_fields, $this->conf->options['acf_fields']);
+			$acf_fields_diff2 = array_diff($this->conf->options['acf_fields'], $new_acf_fields);
+			$this->conf->options['acf_fields'] = $new_acf_fields;
 
-            //Turning off warnings turns existing warnings into "broken" links.
+			//Turning off warnings turns existing warnings into "broken" links.
 			$warnings_enabled = !empty($_POST['warnings_enabled']);
 			if ( $this->conf->get('warnings_enabled') && !$warnings_enabled ) {
 				$this->promote_warnings_to_broken();
@@ -479,20 +479,20 @@ class wsBrokenLinkChecker {
 			$this->conf->options['warnings_enabled'] = $warnings_enabled;
 
 			//HTTP timeout
-            $new_timeout = intval($_POST['timeout']);
-            if( $new_timeout > 0 ){
-                $this->conf->options['timeout'] = $new_timeout ;
-            }
+			$new_timeout = intval($_POST['timeout']);
+			if( $new_timeout > 0 ){
+				$this->conf->options['timeout'] = $new_timeout ;
+			}
 
-            //Server load limit
-            if ( isset($_POST['server_load_limit']) ){
-            	$this->conf->options['server_load_limit'] = floatval($_POST['server_load_limit']);
-            	if ( $this->conf->options['server_load_limit'] < 0 ){
+			//Server load limit
+			if ( isset($_POST['server_load_limit']) ){
+				$this->conf->options['server_load_limit'] = floatval($_POST['server_load_limit']);
+				if ( $this->conf->options['server_load_limit'] < 0 ){
 					$this->conf->options['server_load_limit'] = 0;
 				}
 
 				$this->conf->options['enable_load_limit'] = $this->conf->options['server_load_limit'] > 0;
-            }
+			}
 
 			//Target resource usage (1% to 100%)
 			if ( isset($_POST['target_resource_usage']) ) {
@@ -501,28 +501,28 @@ class wsBrokenLinkChecker {
 				$this->conf->options['target_resource_usage'] = $usage;
 			}
 
-            //When to run the checker
-            $this->conf->options['run_in_dashboard'] = !empty($_POST['run_in_dashboard']);
-            $this->conf->options['run_via_cron'] = !empty($_POST['run_via_cron']);
+			//When to run the checker
+			$this->conf->options['run_in_dashboard'] = !empty($_POST['run_in_dashboard']);
+			$this->conf->options['run_via_cron'] = !empty($_POST['run_via_cron']);
 
-            //Email notifications on/off
-            $email_notifications = !empty($_POST['send_email_notifications']);
-	        $send_authors_email_notifications = !empty($_POST['send_authors_email_notifications']);
+			//Email notifications on/off
+			$email_notifications = !empty($_POST['send_email_notifications']);
+			$send_authors_email_notifications = !empty($_POST['send_authors_email_notifications']);
 
-            if (
-	              ($email_notifications && !$this->conf->options['send_email_notifications'])
-	           || ($send_authors_email_notifications && !$this->conf->options['send_authors_email_notifications'])
-            ){
-            	/*
-            	The plugin should only send notifications about links that have become broken
+			if (
+				  ($email_notifications && !$this->conf->options['send_email_notifications'])
+			   || ($send_authors_email_notifications && !$this->conf->options['send_authors_email_notifications'])
+			){
+				/*
+				The plugin should only send notifications about links that have become broken
 				since the time when email notifications were turned on. If we don't do this,
 				the first email notification will be sent nigh-immediately and list *all* broken
 				links that the plugin currently knows about.
 				*/
 				$this->conf->options['last_notification_sent'] = time();
 			}
-            $this->conf->options['send_email_notifications'] = $email_notifications;
-	        $this->conf->options['send_authors_email_notifications'] = $send_authors_email_notifications;
+			$this->conf->options['send_email_notifications'] = $email_notifications;
+			$this->conf->options['send_authors_email_notifications'] = $send_authors_email_notifications;
 
 			$this->conf->options['notification_email_address'] = strval($_POST['notification_email_address']);
 			$notification_email_addresses = explode(',', $this->conf->options['notification_email_address']);
@@ -532,10 +532,10 @@ class wsBrokenLinkChecker {
 				}
 			}
 
-	        $widget_cap = strval($_POST['dashboard_widget_capability']);
-	        if ( !empty($widget_cap) ) {
-		        $this->conf->options['dashboard_widget_capability'] = $widget_cap;
-	        }
+			$widget_cap = strval($_POST['dashboard_widget_capability']);
+			if ( !empty($widget_cap) ) {
+				$this->conf->options['dashboard_widget_capability'] = $widget_cap;
+			}
 
 			//Link actions. The user can hide some of them to reduce UI clutter.
 			$show_link_actions = array();
@@ -582,7 +582,7 @@ class wsBrokenLinkChecker {
 			//Make settings that affect our Cron events take effect immediately
 			$this->setup_cron_events();
 
-            $this->conf->save_options();
+			$this->conf->save_options();
 
 			/*
 			 If the list of custom fields was modified then we MUST resynchronize or
@@ -624,30 +624,30 @@ class wsBrokenLinkChecker {
 			//Redirect back to the settings page
 			$base_url = remove_query_arg( array('_wpnonce', 'noheader', 'updated', 'error', 'action', 'message') );
 			wp_redirect( add_query_arg( array( 'settings-updated' => true), $base_url ) );
-        }
+		}
 
-        //Show a confirmation message when settings are saved.
-        if ( !empty($_GET['settings-updated']) ){
-        	echo '<div id="message" class="updated fade"><p><strong>',__('Einstellungen gespeichert.', 'psource-link-checker'), '</strong></p></div>';
+		//Show a confirmation message when settings are saved.
+		if ( !empty($_GET['settings-updated']) ){
+			echo '<div id="message" class="updated fade"><p><strong>',__('Einstellungen gespeichert.', 'psource-link-checker'), '</strong></p></div>';
 
-        }
+		}
 
-        //Show a thank-you message when a donation is made.
-        if ( !empty($_GET['donated']) ){
-        	echo '<div id="message" class="updated fade"><p><strong>',__('Vielen Dank für Deine Spende!', 'psource-link-checker'), '</strong></p></div>';
-        	$this->conf->set('user_has_donated', true);
-	        $this->conf->save_options();
-        }
+		//Show a thank-you message when a donation is made.
+		if ( !empty($_GET['donated']) ){
+			echo '<div id="message" class="updated fade"><p><strong>',__('Vielen Dank für Deine Spende!', 'psource-link-checker'), '</strong></p></div>';
+			$this->conf->set('user_has_donated', true);
+			$this->conf->save_options();
+		}
 
-        //Show one when recheck is started, too.
-        if ( !empty($_GET['recheck-initiated']) ){
-        	echo '<div id="message" class="updated fade"><p><strong>',
-			     	__('Die vollständige Überprüfung der Website wurde gestartet.', 'psource-link-checker'), // -- Yoda
-			     '</strong></p></div>';
-        }
+		//Show one when recheck is started, too.
+		if ( !empty($_GET['recheck-initiated']) ){
+			echo '<div id="message" class="updated fade"><p><strong>',
+					__('Die vollständige Überprüfung der Website wurde gestartet.', 'psource-link-checker'), // -- Yoda
+				 '</strong></p></div>';
+		}
 
-        //Cull invalid and missing modules
-        $moduleManager->validate_active_modules();
+		//Cull invalid and missing modules
+		$moduleManager->validate_active_modules();
 
 		$debug = $this->get_debug_info();
 
@@ -682,55 +682,58 @@ class wsBrokenLinkChecker {
 		</style>
 		<![endif]-->
 
-        <div class="wrap" id="blc-settings-wrap">
+		<div class="wrap" id="blc-settings-wrap">
 		<h2><?php _e('Broken Link Checker-Optionen', 'psource-link-checker'); ?></h2>
 
-        <div id="blc-admin-content">
+		<div id="blc-admin-content">
 
-        <form name="link_checker_options" id="link_checker_options" method="post" action="<?php
+		<form name="link_checker_options" id="link_checker_options" method="post" action="<?php
 			echo admin_url('options-general.php?page=link-checker-settings&noheader=1');
 		?>">
-        <?php
+		<?php
 			wp_nonce_field('link-checker-options');
 		?>
 
 		<div id="blc-tabs">
 
-		<ul class="hide-if-no-js">
+		<ul class="hide-if-no-js ui-tabs-nav">
 			<?php
+				$first = true;
 				foreach($section_names as $section_id => $section_name){
 					printf(
-						'<li id="tab-button-%s"><a href="#section-%s" title="%s">%s</a></li>',
+						'<li id="tab-button-%s"%s><a href="#section-%s" title="%s">%s</a></li>',
 						esc_attr($section_id),
+						$first ? ' class="ui-tabs-active"' : '',
 						esc_attr($section_id),
 						esc_attr($section_name),
 						$section_name
 					);
+					$first = false;
 				}
 			?>
 		</ul>
 
-		<div id="section-general" class="blc-section">
+		<div id="section-general" class="blc-section" style="display:block;">
 		<h3 class="hide-if-js"><?php echo $section_names['general']; ?></h3>
 
-        <table class="form-table">
+		<table class="form-table">
 
-        <tr valign="top">
-        <th scope="row">
+		<tr valign="top">
+		<th scope="row">
 			<?php _e('Status','psource-link-checker'); ?>
 			<br>
 			<a href="javascript:void(0)" id="blc-debug-info-toggle"><?php _e('Debug-Informationen anzeigen', 'psource-link-checker'); ?></a>
 		</th>
-        <td>
+		<td>
 
-        <div id='wsblc_full_status'>
-            <br/><br/><br/>
-        </div>
+		<div id='wsblc_full_status'>
+			<br/><br/><br/>
+		</div>
 
-        <table id="blc-debug-info">
-        <?php
+		<table id="blc-debug-info">
+		<?php
 
-        //Output the debug info in a table
+		//Output the debug info in a table
 		foreach( $debug as $key => $value ){
 			printf (
 				'<tr valign="top" class="blc-debug-item-%s"><th scope="row">%s</th><td>%s<div class="blc-debug-message">%s</div></td></tr>',
@@ -740,15 +743,15 @@ class wsBrokenLinkChecker {
 				( array_key_exists('message', $value)?$value['message']:'')
 			);
 		}
-        ?>
-        </table>
+		?>
+		</table>
 
-        </td>
-        </tr>
+		</td>
+		</tr>
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Überprüfe jeden Link','psource-link-checker'); ?></th>
-        <td>
+		<tr valign="top">
+		<th scope="row"><?php _e('Überprüfe jeden Link','psource-link-checker'); ?></th>
+		<td>
 
 		<?php
 			printf(
@@ -759,34 +762,34 @@ class wsBrokenLinkChecker {
 				)
 			 );
 		?>
-        <br/>
-        <span class="description">
-        <?php _e('Bestehende Links werden so oft überprüft. Neue Links werden normalerweise so schnell wie möglich überprüft.', 'psource-link-checker'); ?>
-        </span>
+		<br/>
+		<span class="description">
+		<?php _e('Bestehende Links werden so oft überprüft. Neue Links werden normalerweise so schnell wie möglich überprüft.', 'psource-link-checker'); ?>
+		</span>
 
-        </td>
-        </tr>
+		</td>
+		</tr>
 
-        <tr valign="top">
-        <th scope="row"><?php _e('E-Mail Benachrichtigungen', 'psource-link-checker'); ?></th>
-        <td>
-        	<p style="margin-top: 0;">
-        	<label for='send_email_notifications'>
-        		<input type="checkbox" name="send_email_notifications" id="send_email_notifications"
-            	<?php if ($this->conf->options['send_email_notifications']) echo ' checked="checked"'; ?>/>
-            	<?php _e('Sende mir E-Mail-Benachrichtigungen über neu erkannte defekte Links', 'psource-link-checker'); ?>
+		<tr valign="top">
+		<th scope="row"><?php _e('E-Mail Benachrichtigungen', 'psource-link-checker'); ?></th>
+		<td>
+			<p style="margin-top: 0;">
+			<label for='send_email_notifications'>
+				<input type="checkbox" name="send_email_notifications" id="send_email_notifications"
+				<?php if ($this->conf->options['send_email_notifications']) echo ' checked="checked"'; ?>/>
+				<?php _e('Sende mir E-Mail-Benachrichtigungen über neu erkannte defekte Links', 'psource-link-checker'); ?>
 			</label><br />
 			</p>
 
-	        <p>
-        	<label for='send_authors_email_notifications'>
-        		<input type="checkbox" name="send_authors_email_notifications" id="send_authors_email_notifications"
-            	<?php if ($this->conf->options['send_authors_email_notifications']) echo ' checked="checked"'; ?>/>
-            	<?php _e('Sende Autoren E-Mail-Benachrichtigungen über fehlerhafte Links in ihren Beiträgen', 'psource-link-checker'); ?>
+			<p>
+			<label for='send_authors_email_notifications'>
+				<input type="checkbox" name="send_authors_email_notifications" id="send_authors_email_notifications"
+				<?php if ($this->conf->options['send_authors_email_notifications']) echo ' checked="checked"'; ?>/>
+				<?php _e('Sende Autoren E-Mail-Benachrichtigungen über fehlerhafte Links in ihren Beiträgen', 'psource-link-checker'); ?>
 			</label><br />
 			</p>
-        </td>
-        </tr>
+		</td>
+		</tr>
 
 		<tr valign="top">
 			<th scope="row"><?php echo __('Benachrichtigungs-E-Mail-Adresse', 'psource-link-checker'); ?></th>
@@ -807,14 +810,14 @@ class wsBrokenLinkChecker {
 			</td>
 		</tr>
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Link-Optimierungen','psource-link-checker'); ?></th>
-        <td>
-        	<p style="margin-top: 0; margin-bottom: 0.5em;">
-        	<label for='mark_broken_links'>
-        		<input type="checkbox" name="mark_broken_links" id="mark_broken_links"
-            	<?php if ($this->conf->options['mark_broken_links']) echo ' checked="checked"'; ?>/>
-            	<?php _e('Wende benutzerdefinierte Formatierungen auf fehlerhafte Links an', 'psource-link-checker'); ?>
+		<tr valign="top">
+		<th scope="row"><?php _e('Link-Optimierungen','psource-link-checker'); ?></th>
+		<td>
+			<p style="margin-top: 0; margin-bottom: 0.5em;">
+			<label for='mark_broken_links'>
+				<input type="checkbox" name="mark_broken_links" id="mark_broken_links"
+				<?php if ($this->conf->options['mark_broken_links']) echo ' checked="checked"'; ?>/>
+				<?php _e('Wende benutzerdefinierte Formatierungen auf fehlerhafte Links an', 'psource-link-checker'); ?>
 			</label>
 			|
 			<a id="toggle-broken-link-css-editor" href="#" class="blc-toggle-link"><?php
@@ -827,25 +830,25 @@ class wsBrokenLinkChecker {
 					echo ' class="hidden"';
 				}
 			?>>
-		        <textarea name="broken_link_css" id="broken_link_css" cols='45' rows='4'><?php
-		            if( isset($this->conf->options['broken_link_css']) ) {
+				<textarea name="broken_link_css" id="broken_link_css" cols='45' rows='4'><?php
+					if( isset($this->conf->options['broken_link_css']) ) {
 						echo $this->conf->options['broken_link_css'];
 					}
-		        ?></textarea>
-		        <p class="description"><?php
+				?></textarea>
+				<p class="description"><?php
 					printf(
 						__('Beispiel: Lorem ipsum <a %s>defekter Link</a>, Dolor Sit Amet.', 'psource-link-checker'),
 						' href="#" class="broken_link" onclick="return false;"'
 					);
 					echo ' ', __('Klicke auf "Änderungen speichern", um die Beispielausgabe zu aktualisieren.', 'psource-link-checker');
 				?></p>
-        	</div>
+			</div>
 
-        	<p style="margin-bottom: 0.5em;">
-        	<label for='mark_removed_links'>
-        		<input type="checkbox" name="mark_removed_links" id="mark_removed_links"
-            	<?php if ($this->conf->options['mark_removed_links']) echo ' checked="checked"'; ?>/>
-            	<?php _e('Wende eine benutzerdefinierte Formatierung auf entfernte Links an', 'psource-link-checker'); ?>
+			<p style="margin-bottom: 0.5em;">
+			<label for='mark_removed_links'>
+				<input type="checkbox" name="mark_removed_links" id="mark_removed_links"
+				<?php if ($this->conf->options['mark_removed_links']) echo ' checked="checked"'; ?>/>
+				<?php _e('Wende eine benutzerdefinierte Formatierung auf entfernte Links an', 'psource-link-checker'); ?>
 			</label>
 			|
 			<a id="toggle-removed-link-css-editor" href="#" class="blc-toggle-link"><?php
@@ -858,27 +861,27 @@ class wsBrokenLinkChecker {
 					echo ' class="hidden"';
 				}
 			?>>
-		        <textarea name="removed_link_css" id="removed_link_css" cols='45' rows='4'><?php
-		            if( isset($this->conf->options['removed_link_css']) )
-		                echo $this->conf->options['removed_link_css'];
-		        ?></textarea>
+				<textarea name="removed_link_css" id="removed_link_css" cols='45' rows='4'><?php
+					if( isset($this->conf->options['removed_link_css']) )
+						echo $this->conf->options['removed_link_css'];
+				?></textarea>
 
-		        <p class="description"><?php
-			    printf(
-			        __('Beispiel: Lorem ipsum <a %s>defekter Link</a>, Dolor Sit Amet.', 'psource-link-checker'),
-			        ' class="removed_link"'
-		        );
+				<p class="description"><?php
+				printf(
+					__('Beispiel: Lorem ipsum <a %s>defekter Link</a>, Dolor Sit Amet.', 'psource-link-checker'),
+					' class="removed_link"'
+				);
 				echo ' ', __('Klicke auf "Änderungen speichern", um die Beispielausgabe zu aktualisieren.', 'psource-link-checker');
 				?>
 
 				</p>
-        	</div>
+			</div>
 
-        	<p>
-        	<label for='nofollow_broken_links'>
-        		<input type="checkbox" name="nofollow_broken_links" id="nofollow_broken_links"
-            	<?php if ($this->conf->options['nofollow_broken_links']) echo ' checked="checked"'; ?>/>
-            	<?php _e('Verhindere dass Suchmaschinen defekten Links folgen', 'psource-link-checker'); ?>
+			<p>
+			<label for='nofollow_broken_links'>
+				<input type="checkbox" name="nofollow_broken_links" id="nofollow_broken_links"
+				<?php if ($this->conf->options['nofollow_broken_links']) echo ' checked="checked"'; ?>/>
+				<?php _e('Verhindere dass Suchmaschinen defekten Links folgen', 'psource-link-checker'); ?>
 			</label>
 			</p>
 
@@ -891,8 +894,8 @@ class wsBrokenLinkChecker {
 				);
 				?>
 			</p>
-        </td>
-        </tr>
+		</td>
+		</tr>
 
 			<tr valign="top">
 				<th scope="row"><?php echo _x('Vorschläge', 'settings page', 'psource-link-checker'); ?></th>
@@ -919,42 +922,42 @@ class wsBrokenLinkChecker {
 				</td>
 			</tr>
 
-        </table>
+		</table>
 
-        </div>
+		</div>
 
-        <div id="section-where" class="blc-section">
+		<div id="section-where" class="blc-section" style="display:none;">
 		<h3 class="hide-if-js"><?php echo $section_names['where']; ?></h3>
 
-        <table class="form-table">
+		<table class="form-table">
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Suche nach Links in', 'psource-link-checker'); ?></th>
-        <td>
-    	<?php
-    	if ( !empty($modules['container']) ){
-    		uasort(
+		<tr valign="top">
+		<th scope="row"><?php _e('Suche nach Links in', 'psource-link-checker'); ?></th>
+		<td>
+		<?php
+		if ( !empty($modules['container']) ){
+			uasort(
 				$modules['container'],
 				function( $a, $b ) {
 					return strcasecmp( $a["Name"], $b["Name"] );
 				}
 			);
-    		$this->print_module_list($modules['container'], $this->conf->options);
-    	}
-    	?>
-    	</td></tr>
+			$this->print_module_list($modules['container'], $this->conf->options);
+		}
+		?>
+		</td></tr>
 
-    	<tr valign="top">
-        <th scope="row"><?php _e('Beitragsstatus', 'psource-link-checker'); ?></th>
-        <td>
-    	<?php
-    	    $available_statuses = get_post_stati(array('internal' => false), 'objects');
+		<tr valign="top">
+		<th scope="row"><?php _e('Beitragsstatus', 'psource-link-checker'); ?></th>
+		<td>
+		<?php
+			$available_statuses = get_post_stati(array('internal' => false), 'objects');
 
-    	    if ( isset($this->conf->options['enabled_post_statuses']) ){
-    	    	$enabled_post_statuses = $this->conf->options['enabled_post_statuses'];
-    	    } else {
-    	    	$enabled_post_statuses = array();
-    	    }
+			if ( isset($this->conf->options['enabled_post_statuses']) ){
+				$enabled_post_statuses = $this->conf->options['enabled_post_statuses'];
+			} else {
+				$enabled_post_statuses = array();
+			}
 
 			foreach($available_statuses as $status => $status_object){
 				printf(
@@ -964,73 +967,73 @@ class wsBrokenLinkChecker {
 					$status_object->label
 				);
 			}
-    	?>
-    	</td></tr>
+		?>
+		</td></tr>
 
-        </table>
+		</table>
 
-        </div>
+		</div>
 
 
-        <div id="section-which" class="blc-section">
+		<div id="section-which" class="blc-section" style="display:none;">
 		<h3 class="hide-if-js"><?php echo $section_names['which']; ?></h3>
 
-        <table class="form-table">
+		<table class="form-table">
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Linktypen', 'psource-link-checker'); ?></th>
-        <td>
-        <?php
-        if ( !empty($modules['parser']) ){
-        	$this->print_module_list($modules['parser'], $this->conf->options);
-        } else {
-        	echo __('Fehler: Alle Link-Parser fehlen!', 'psource-link-checker');
-        }
-    	?>
-    	</td>
+		<tr valign="top">
+		<th scope="row"><?php _e('Linktypen', 'psource-link-checker'); ?></th>
+		<td>
+		<?php
+		if ( !empty($modules['parser']) ){
+			$this->print_module_list($modules['parser'], $this->conf->options);
+		} else {
+			echo __('Fehler: Alle Link-Parser fehlen!', 'psource-link-checker');
+		}
+		?>
+		</td>
 		</tr>
 
-    	<tr valign="top">
-        <th scope="row"><?php _e('Ausschlussliste', 'psource-link-checker'); ?></th>
-        <td><?php _e("Überprüfe keine Links, bei denen die URL eines dieser Wörter enthält (eines pro Zeile). :", 'psource-link-checker'); ?><br/>
-        <textarea name="exclusion_list" id="exclusion_list" cols='45' rows='4'><?php
-            if( isset($this->conf->options['exclusion_list']) )
-                echo esc_textarea(implode("\n", $this->conf->options['exclusion_list']));
-        ?></textarea>
+		<tr valign="top">
+		<th scope="row"><?php _e('Ausschlussliste', 'psource-link-checker'); ?></th>
+		<td><?php _e("Überprüfe keine Links, bei denen die URL eines dieser Wörter enthält (eines pro Zeile). :", 'psource-link-checker'); ?><br/>
+		<textarea name="exclusion_list" id="exclusion_list" cols='45' rows='4'><?php
+			if( isset($this->conf->options['exclusion_list']) )
+				echo esc_textarea(implode("\n", $this->conf->options['exclusion_list']));
+		?></textarea>
 
-        </td>
-        </tr>
+		</td>
+		</tr>
 
-        </table>
-        </div>
+		</table>
+		</div>
 
-        <div id="section-how" class="blc-section">
+		<div id="section-how" class="blc-section" style="display:none;">
 		<h3 class="hide-if-js"><?php echo $section_names['how']; ?></h3>
 
-        <table class="form-table">
+		<table class="form-table">
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Überprüfe die Links mit', 'psource-link-checker'); ?></th>
-        <td>
-        <?php
-    	if ( !empty($modules['checker']) ){
-    		$modules['checker'] = array_reverse($modules['checker']);
-        	$this->print_module_list($modules['checker'], $this->conf->options);
-        }
-    	?>
-    	</td></tr>
+		<tr valign="top">
+		<th scope="row"><?php _e('Überprüfe die Links mit', 'psource-link-checker'); ?></th>
+		<td>
+		<?php
+		if ( !empty($modules['checker']) ){
+			$modules['checker'] = array_reverse($modules['checker']);
+			$this->print_module_list($modules['checker'], $this->conf->options);
+		}
+		?>
+		</td></tr>
 
-        </table>
-        </div>
+		</table>
+		</div>
 
-        <div id="section-advanced" class="blc-section">
+		<div id="section-advanced" class="blc-section" style="display:none;">
 		<h3 class="hide-if-js"><?php echo $section_names['advanced']; ?></h3>
 
-        <table class="form-table">
+		<table class="form-table">
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Timeout', 'psource-link-checker'); ?></th>
-        <td>
+		<tr valign="top">
+		<th scope="row"><?php _e('Timeout', 'psource-link-checker'); ?></th>
+		<td>
 
 		<?php
 
@@ -1043,59 +1046,59 @@ class wsBrokenLinkChecker {
 		);
 
 		?>
-        <br/><span class="description">
-        <?php _e('Links, deren Laden länger dauert, werden als fehlerhaft markiert.','psource-link-checker'); ?>
+		<br/><span class="description">
+		<?php _e('Links, deren Laden länger dauert, werden als fehlerhaft markiert.','psource-link-checker'); ?>
 		</span>
 
-        </td>
-        </tr>
+		</td>
+		</tr>
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Link Monitor', 'psource-link-checker'); ?></th>
-        <td>
+		<tr valign="top">
+		<th scope="row"><?php _e('Link Monitor', 'psource-link-checker'); ?></th>
+		<td>
 
-        	<p>
+			<p>
 			<label for='run_in_dashboard'>
 
-	        		<input type="checkbox" name="run_in_dashboard" id="run_in_dashboard"
-	            	<?php if ($this->conf->options['run_in_dashboard']) echo ' checked="checked"'; ?>/>
-	            	<?php _e('Laufe kontinuierlich, während das Dashboard geöffnet ist', 'psource-link-checker'); ?>
+					<input type="checkbox" name="run_in_dashboard" id="run_in_dashboard"
+					<?php if ($this->conf->options['run_in_dashboard']) echo ' checked="checked"'; ?>/>
+					<?php _e('Laufe kontinuierlich, während das Dashboard geöffnet ist', 'psource-link-checker'); ?>
 			</label>
 			</p>
 
 			<p>
 			<label for='run_via_cron'>
-	        		<input type="checkbox" name="run_via_cron" id="run_via_cron"
-	            	<?php if ($this->conf->options['run_via_cron']) echo ' checked="checked"'; ?>/>
-	            	<?php _e('Laufe stündlich im Hintergrund', 'psource-link-checker'); ?>
+					<input type="checkbox" name="run_via_cron" id="run_via_cron"
+					<?php if ($this->conf->options['run_via_cron']) echo ' checked="checked"'; ?>/>
+					<?php _e('Laufe stündlich im Hintergrund', 'psource-link-checker'); ?>
 			</label>
 			</p>
 
-        </td>
-        </tr>
+		</td>
+		</tr>
 
-        <tr valign="top">
-	        <th scope="row"><?php _e('Zeige das Dashboard-Widget für an', 'psource-link-checker'); ?></th>
-	        <td>
+		<tr valign="top">
+			<th scope="row"><?php _e('Zeige das Dashboard-Widget für an', 'psource-link-checker'); ?></th>
+			<td>
 
-		        <?php
+				<?php
 				$widget_caps = array(
 					_x('Administrator', 'dashboard widget visibility', 'psource-link-checker') => 'manage_options',
 					_x('Editor und höher', 'dashboard widget visibility', 'psource-link-checker') => 'edit_others_posts',
 					_x('Niemand (deaktiviert das Widget)', 'dashboard widget visibility', 'psource-link-checker') => 'do_not_allow',
 				);
 
-		        foreach($widget_caps as $title => $capability) {
-			        printf(
-				        '<p><label><input type="radio" name="dashboard_widget_capability" value="%s"%s> %s</label></p>',
-				        esc_attr($capability),
-				        checked($capability, $this->conf->get('dashboard_widget_capability'), false),
-				        $title
-			        );
-		        }
-		        ?>
-	        </td>
-        </tr>
+				foreach($widget_caps as $title => $capability) {
+					printf(
+						'<p><label><input type="radio" name="dashboard_widget_capability" value="%s"%s> %s</label></p>',
+						esc_attr($capability),
+						checked($capability, $this->conf->get('dashboard_widget_capability'), false),
+						$title
+					);
+				}
+				?>
+			</td>
+		</tr>
 
 		<tr valign="top">
 			<th scope="row"><?php echo _x('Linkaktionen anzeigen', 'settings page', 'psource-link-checker'); ?></th>
@@ -1115,9 +1118,9 @@ class wsBrokenLinkChecker {
 			</td>
 		</tr>
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Max. Ausführungszeit', 'psource-link-checker'); ?></th>
-        <td>
+		<tr valign="top">
+		<th scope="row"><?php _e('Max. Ausführungszeit', 'psource-link-checker'); ?></th>
+		<td>
 
 		<?php
 
@@ -1130,20 +1133,20 @@ class wsBrokenLinkChecker {
 		);
 
 		?>
-        <br/><span class="description">
-        <?php
+		<br/><span class="description">
+		<?php
 
-        _e('Das Plugin startet regelmäßig einen Hintergrundjob, der Deine Beiträge auf Links analysiert, die erkannten URLs überprüft und andere zeitaufwändige Aufgaben ausführt. Hier kannst Du festlegen, wie lange der Verbindungsmonitor höchstens jedes Mal ausgeführt werden darf, bevor er angehalten wird.', 'psource-link-checker');
+		_e('Das Plugin startet regelmäßig einen Hintergrundjob, der Deine Beiträge auf Links analysiert, die erkannten URLs überprüft und andere zeitaufwändige Aufgaben ausführt. Hier kannst Du festlegen, wie lange der Verbindungsmonitor höchstens jedes Mal ausgeführt werden darf, bevor er angehalten wird.', 'psource-link-checker');
 
 		?>
 		</span>
 
-        </td>
-        </tr>
+		</td>
+		</tr>
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Serverlastbegrenzung', 'psource-link-checker'); ?></th>
-        <td>
+		<tr valign="top">
+		<th scope="row"><?php _e('Serverlastbegrenzung', 'psource-link-checker'); ?></th>
+		<td>
 		<?php
 
 		$load = blcUtility::get_server_load();
@@ -1161,24 +1164,24 @@ class wsBrokenLinkChecker {
 				'<span id="wsblc_current_load">...</span>'
 			);
 			echo '<br/><span class="description">';
-	        printf(
-	        	__(
+			printf(
+				__(
 					'Die Linkprüfung wird ausgesetzt, wenn die durchschnittliche <a href="%s">Serverlast</a> über diese Zahl steigt. Lasse dieses Feld leer, um die Lastbegrenzung zu deaktivieren.',
 					'psource-link-checker'
 				),
 				'http://en.wikipedia.org/wiki/Load_(computing)'
-	        );
-	        echo '</span>';
+			);
+			echo '</span>';
 
-        } else {
-        	echo '<input type="text" disabled="disabled" value="', esc_attr(__('Nicht verfügbar', 'psource-link-checker')), '" size="13"/><br>';
-        	echo '<span class="description">';
+		} else {
+			echo '<input type="text" disabled="disabled" value="', esc_attr(__('Nicht verfügbar', 'psource-link-checker')), '" size="13"/><br>';
+			echo '<span class="description">';
 			_e('Die Lastbegrenzung funktioniert nur auf Linux-ähnlichen Systemen, auf denen <code>/proc/loadavg</code> vorhanden und zugänglich ist.', 'psource-link-checker');
 			echo '</span>';
 		}
 		?>
-        </td>
-        </tr>
+		</td>
+		</tr>
 
 		<tr valign="top">
 			<th scope="row"><?php _e('Zielressourcennutzung', 'psource-link-checker'); ?></th>
@@ -1246,62 +1249,62 @@ class wsBrokenLinkChecker {
 		</tr>
 
 
-        <tr valign="top">
-        <th scope="row"><?php _e('Erzwungene erneute Überprüfung', 'psource-link-checker'); ?></th>
-        <td>
-        	<input class="button" type="button" name="start-recheck" id="start-recheck"
+		<tr valign="top">
+		<th scope="row"><?php _e('Erzwungene erneute Überprüfung', 'psource-link-checker'); ?></th>
+		<td>
+			<input class="button" type="button" name="start-recheck" id="start-recheck"
 				  value="<?php _e('Überprüfe alle Seiten erneut', 'psource-link-checker'); ?>"  />
-  			<input type="hidden" name="recheck" value="" id="recheck" />
+			<input type="hidden" name="recheck" value="" id="recheck" />
 			<br />
-  			<span class="description"><?php
+			<span class="description"><?php
 			  _e('Die "Nuklearoption". Klicke auf diese Schaltfläche, damit das Plugin seine Linkdatenbank leer macht und die gesamte Seite von Grund auf neu überprüft.', 'psource-link-checker');
 
-	  		?></span>
+			?></span>
 		</td>
 		</tr>
 
-        </table>
-        </div>
+		</table>
+		</div>
 
-        </div>
+		</div>
 
-        <p class="submit"><input type="submit" name="submit" class='button-primary' value="<?php _e('Änderungen speichern') ?>" /></p>
-        </form>
+		<p class="submit"><input type="submit" name="submit" class='button-primary' value="<?php _e('Änderungen speichern') ?>" /></p>
+		</form>
 
-        </div> <!-- First postbox-container -->
-
-
-        </div>
+		</div> <!-- First postbox-container -->
 
 
+		</div>
 
-        <?php
-        //The various JS for this page is stored in a separate file for the purposes readability.
-        include dirname($this->loader) . '/includes/admin/options-page-js.php';
-    }
 
-    /**
-     * Output a list of modules and their settings.
+
+		<?php
+		//The various JS for this page is stored in a separate file for the purposes readability.
+		include dirname($this->loader) . '/includes/admin/options-page-js.php';
+	}
+
+	/**
+	 * Output a list of modules and their settings.
 	 *
-     * Each list entry will contain a checkbox that is checked if the module is
-     * currently active.
-     *
-     * @param array $modules Array of modules to display
-     * @param array $current_settings
-     * @return void
-     */
-    function print_module_list($modules, $current_settings){
-    	$moduleManager = blcModuleManager::getInstance();
+	 * Each list entry will contain a checkbox that is checked if the module is
+	 * currently active.
+	 *
+	 * @param array $modules Array of modules to display
+	 * @param array $current_settings
+	 * @return void
+	 */
+	function print_module_list($modules, $current_settings){
+		$moduleManager = blcModuleManager::getInstance();
 
-    	foreach($modules as $module_id => $module_data){
+		foreach($modules as $module_id => $module_data){
 			$module_id = $module_data['ModuleID'];
 
 			$style = $module_data['ModuleHidden']?' style="display:none;"':'';
 
-    		printf(
-    			'<div class="module-container" id="module-container-%s"%s>',
-		   		$module_id,
-   				$style
+			printf(
+				'<div class="module-container" id="module-container-%s"%s>',
+				$module_id,
+				$style
 			);
 			$this->print_module_checkbox($module_id, $module_data, $moduleManager->is_active($module_id));
 
@@ -1335,27 +1338,27 @@ class wsBrokenLinkChecker {
 			}
 
 			echo '</div>';
-    	}
-    }
+		}
+	}
 
-    /**
-     * Output a checkbox for a module.
-     *
-     * Generates a simple checkbox that can be used to mark a module as active/inactive.
-     * If the specified module can't be deactivated (ModuleAlwaysActive = true), the checkbox
+	/**
+	 * Output a checkbox for a module.
+	 *
+	 * Generates a simple checkbox that can be used to mark a module as active/inactive.
+	 * If the specified module can't be deactivated (ModuleAlwaysActive = true), the checkbox
 	 * will be displayed in a disabled state and a hidden field will be created to make
 	 * form submissions work correctly.
-     *
-     * @param string $module_id Module ID.
-     * @param array $module_data Associative array of module data.
-     * @param bool $active If true, the newly created checkbox will start out checked.
-     * @return void
-     */
-    function print_module_checkbox($module_id, $module_data, $active = false){
-    	$disabled = false;
-    	$name_prefix = 'module';
-    	$label_class = '';
-    	$active = $active || $module_data['ModuleAlwaysActive'];
+	 *
+	 * @param string $module_id Module ID.
+	 * @param array $module_data Associative array of module data.
+	 * @param bool $active If true, the newly created checkbox will start out checked.
+	 * @return void
+	 */
+	function print_module_checkbox($module_id, $module_data, $active = false){
+		$disabled = false;
+		$name_prefix = 'module';
+		$label_class = '';
+		$active = $active || $module_data['ModuleAlwaysActive'];
 
 		if ( $module_data['ModuleAlwaysActive'] ){
 			$disabled = true;
@@ -1373,7 +1376,7 @@ class wsBrokenLinkChecker {
 			</label>',
 			esc_attr($label_class),
 			$name_prefix,
-	   		esc_attr($module_id),
+			esc_attr($module_id),
 			esc_attr($module_id),
 			$checked,
 			$module_data['Name']
@@ -1385,82 +1388,91 @@ class wsBrokenLinkChecker {
 				esc_attr($module_id)
 			);
 		}
-    }
+	}
 
-    /**
-     * Add extra settings to the "Custom fields" entry on the plugin's config. page.
+	/**
+	 * Add extra settings to the "Custom fields" entry on the plugin's config. page.
 	 *
 	 * Callback for the 'blc-module-settings-custom_field' filter.
-     *
-     * @param string $html Current extra HTML
-     * @param array $current_settings The current plugin configuration.
-     * @return string New extra HTML.
-     */
-    function make_custom_field_input($html, $current_settings){
-    	$html .= '<span class="description">' .
+	 *
+	 * @param string $html Current extra HTML
+	 * @param array $current_settings The current plugin configuration.
+	 * @return string New extra HTML.
+	 */
+	function make_custom_field_input($html, $current_settings){
+		$html .= '<span class="description">' .
 					__(
 						'Gib die Namen der benutzerdefinierten Felder ein, die Du überprüfen möchtest (eines pro Zeile). Wenn ein Feld HTML-Code enthält, stelle seinem Namen <code>html:</code> voran. Zum Beispiel, <code>html:field_name</code>.',
 						'psource-link-checker'
 					) .
 				 '</span>';
-    	$html .= '<br><textarea name="blc_custom_fields" id="blc_custom_fields" cols="45" rows="4">';
-        if( isset($current_settings['custom_fields']) ){
-            $html .= esc_textarea(implode("\n", $current_settings['custom_fields']));
-        }
-        $html .= '</textarea>';
+		$html .= '<br><textarea name="blc_custom_fields" id="blc_custom_fields" cols="45" rows="4">';
+		if( isset($current_settings['custom_fields']) ){
+			$html .= esc_textarea(implode("\n", $current_settings['custom_fields']));
+		}
+		$html .= '</textarea>';
 
-        return $html;
-    }
-    function make_acf_field_input($html, $current_settings) {
-        $html .= '<span class="description">' . __('Gib die Schlüssel der ACF-Felder ein, die Du überprüfen möchtest (einen pro Zeile). Wenn ein Feld HTML-Code enthält, stelle seinem Namen <code>html:</code> voran. Zum Beispiel, <code>html:field_586a3eaa4091b</code>.', 'psource-link-checker') . '</span>';
-        $html .= '<br><textarea name="blc_acf_fields" id="blc_acf_fields" cols="45" rows="4">';
-        if (isset($current_settings['acf_fields'])) {
-            $html .= esc_textarea(implode("\n", $current_settings['acf_fields']));
-        }
-        $html .= '</textarea>';
+		return $html;
+	}
+	function make_acf_field_input($html, $current_settings) {
+		$html .= '<span class="description">' . __('Gib die Schlüssel der ACF-Felder ein, die Du überprüfen möchtest (einen pro Zeile). Wenn ein Feld HTML-Code enthält, stelle seinem Namen <code>html:</code> voran. Zum Beispiel, <code>html:field_586a3eaa4091b</code>.', 'psource-link-checker') . '</span>';
+		$html .= '<br><textarea name="blc_acf_fields" id="blc_acf_fields" cols="45" rows="4">';
+		if (isset($current_settings['acf_fields'])) {
+			$html .= esc_textarea(implode("\n", $current_settings['acf_fields']));
+		}
+		$html .= '</textarea>';
 
-        return $html;
-    }
-    /**
-     * Enqueue CSS file for the plugin's Settings page.
-     *
-     * @return void
-     */
-    function options_page_css(){
-    	wp_enqueue_style('blc-options-page', plugins_url('css/options-page.css', BLC_PLUGIN_FILE), array(), '20141113');
-    	wp_enqueue_style('dashboard');
+		return $html;
+	}
+
+	/**
+	 * Enqueue CSS file for the plugin's Settings page.
+	 *
+	 * @return void
+	 */
+	function options_page_css(){
+		error_log('options_page_css geladen');
+		wp_enqueue_style('blc-options-page', plugins_url('css/options-page.css', BLC_PLUGIN_FILE), array(), '20141113');
+		wp_enqueue_style('dashboard');
+		wp_enqueue_script(
+			'blc-options-tabs',
+			plugins_url('js/options-tabs.js', BLC_PLUGIN_FILE),
+			array(),
+			'20250717',
+			true
+		);
 	}
 
 
-    /**
-     * Display the "Broken Links" page, listing links detected by the plugin and their status.
-     *
-     * @return void
-     */
-    function links_page(){
-        global $wpdb; /* @var wpdb $wpdb */
+	/**
+	 * Display the "Broken Links" page, listing links detected by the plugin and their status.
+	 *
+	 * @return void
+	 */
+	function links_page(){
+		global $wpdb; /* @var wpdb $wpdb */
 
-        $blc_link_query = blcLinkQuery::getInstance();
+		$blc_link_query = blcLinkQuery::getInstance();
 
 		//Cull invalid and missing modules so that we don't get dummy links/instances showing up.
-        $moduleManager = blcModuleManager::getInstance();
-        $moduleManager->validate_active_modules();
+		$moduleManager = blcModuleManager::getInstance();
+		$moduleManager->validate_active_modules();
 
-        if ( defined('BLC_DEBUG') && constant('BLC_DEBUG') ){
-        	//Make module headers translatable. They need to be formatted corrrectly and
-        	//placed in a .php file to be visible to the script(s) that generate .pot files.
-        	$code = $moduleManager->_build_header_translation_code();
-        	file_put_contents( dirname($this->loader) . '/includes/extra-strings.php', $code );
-        }
+		if ( defined('BLC_DEBUG') && constant('BLC_DEBUG') ){
+			//Make module headers translatable. They need to be formatted corrrectly and
+			//placed in a .php file to be visible to the script(s) that generate .pot files.
+			$code = $moduleManager->_build_header_translation_code();
+			file_put_contents( dirname($this->loader) . '/includes/extra-strings.php', $code );
+		}
 
-        $action = !empty($_POST['action'])?$_POST['action']:'';
-        if ( intval($action) == -1 ){
-        	//Try the second bulk actions box
+		$action = !empty($_POST['action'])?$_POST['action']:'';
+		if ( intval($action) == -1 ){
+			//Try the second bulk actions box
 			$action = !empty($_POST['action2'])?$_POST['action2']:'';
 		}
 
-        //Get the list of link IDs selected via checkboxes
-        $selected_links = array();
+		//Get the list of link IDs selected via checkboxes
+		$selected_links = array();
 		if ( isset($_POST['selected_links']) && is_array($_POST['selected_links']) ){
 			//Convert all link IDs to integers (non-numeric entries are converted to zero)
 			$selected_links = array_map('intval', $_POST['selected_links']);
@@ -1468,14 +1480,14 @@ class wsBrokenLinkChecker {
 			$selected_links = array_filter($selected_links);
 		}
 
-        $message = '';
-        $msg_class = 'updated';
+		$message = '';
+		$msg_class = 'updated';
 
-        //Run the selected bulk action, if any
-        $force_delete = false;
-        switch ( $action ){
-        	case 'create-custom-filter':
-        		list($message, $msg_class) = $this->do_create_custom_filter();
+		//Run the selected bulk action, if any
+		$force_delete = false;
+		switch ( $action ){
+			case 'create-custom-filter':
+				list($message, $msg_class) = $this->do_create_custom_filter();
 				break;
 
 			case 'delete-custom-filter':
@@ -1512,7 +1524,7 @@ class wsBrokenLinkChecker {
 			case 'bulk-edit':
 				list($message, $msg_class) = $this->do_bulk_edit($selected_links);
 				break;
-        }
+		}
 
 
 		if ( !empty($message) ){
@@ -1521,8 +1533,8 @@ class wsBrokenLinkChecker {
 
 		$start_time = microtime_float();
 
-        //Load custom filters, if any
-        $blc_link_query->load_custom_filters();
+		//Load custom filters, if any
+		$blc_link_query->load_custom_filters();
 
 		//Calculate the number of links matching each filter
 		$blc_link_query->count_filter_results();
@@ -1545,7 +1557,7 @@ class wsBrokenLinkChecker {
 		if ( empty($current_filter['links']) && !empty($wpdb->last_error) ){
 			printf( __('Datenbankfehler: %s', 'psource-link-checker'), $wpdb->last_error);
 		}
-        ?>
+		?>
 
 <script type='text/javascript'>
 	var blc_current_filter = '<?php echo $filter_id; ?>';
@@ -1571,7 +1583,7 @@ class wsBrokenLinkChecker {
 		}
 
 		//Display the links, if any
-        if( $current_filter['links'] && ( count($current_filter['links']) > 0 ) ) {
+		if( $current_filter['links'] && ( count($current_filter['links']) > 0 ) ) {
 
 			include dirname($this->loader) . '/includes/admin/table-printer.php';
 			$table = new blcTablePrinter($this);
@@ -1582,14 +1594,14 @@ class wsBrokenLinkChecker {
 				$this->conf->options['table_compact']
 			);
 
-        };
+		};
 		printf('<!-- Insgesamt benötigt: %.4f Sekunden -->', microtime_float() - $start_time);
 
 		//Load assorted JS event handlers and other shinies
 		include dirname($this->loader) . '/includes/admin/links-page-js.php';
 
 		?></div><?php
-    }
+	}
 
   /**
    * Create a custom link filter using params passed in $_POST.
@@ -1599,14 +1611,14 @@ class wsBrokenLinkChecker {
    *
    * @return array Message and the CSS class to apply to the message.
    */
-    function do_create_custom_filter(){
-	    global $wpdb;
+	function do_create_custom_filter(){
+		global $wpdb;
 
 		//Create a custom filter!
-    	check_admin_referer( 'create-custom-filter' );
-    	$msg_class = 'updated';
+		check_admin_referer( 'create-custom-filter' );
+		$msg_class = 'updated';
 
-    	//Filter name must be set
+		//Filter name must be set
 		if ( empty($_POST['name']) ){
 			$message = __("Du musst einen Filternamen eingeben!", 'psource-link-checker');
 			$msg_class = 'error';
@@ -2103,8 +2115,8 @@ class wsBrokenLinkChecker {
 		$processed_links = 0;
 
 		if ( count($selected_links) > 0 ){
-            $transactionManager = TransactionManager::getInstance();
-            $transactionManager->start();
+			$transactionManager = TransactionManager::getInstance();
+			$transactionManager->start();
 			foreach($selected_links as $link_id){
 				//Load the link
 				$link = new blcLink( intval($link_id) );
@@ -2141,7 +2153,7 @@ class wsBrokenLinkChecker {
 		}
 
 		if ( $processed_links > 0 ){
-            $transactionManager->commit();
+			$transactionManager->commit();
 			$messages[] = sprintf(
 				_n(
 					'%d Link als nicht defekt markiert',
@@ -2170,8 +2182,8 @@ class wsBrokenLinkChecker {
 		$processed_links = 0;
 
 		if ( count($selected_links) > 0 ){
-            $transactionManager = TransactionManager::getInstance();
-            $transactionManager->start();
+			$transactionManager = TransactionManager::getInstance();
+			$transactionManager->start();
 			foreach($selected_links as $link_id){
 				//Load the link
 				$link = new blcLink( intval($link_id) );
@@ -2203,7 +2215,7 @@ class wsBrokenLinkChecker {
 		}
 
 		if ( $processed_links > 0 ){
-            $transactionManager->commit();
+			$transactionManager->commit();
 			$messages[] = sprintf(
 				_n(
 					'%d Link verworfen',
@@ -2340,10 +2352,10 @@ class wsBrokenLinkChecker {
 			$this->conf->options['highlight_permanent_failures'] ? ' checked="checked"' : ''
 		);
 		$input_box = sprintf(
-        	'</label><input type="text" name="failure_duration_threshold" id="failure_duration_threshold" value="%d" size="2"><label for="highlight_permanent_failures">',
-        	$this->conf->options['failure_duration_threshold']
+			'</label><input type="text" name="failure_duration_threshold" id="failure_duration_threshold" value="%d" size="2"><label for="highlight_permanent_failures">',
+			$this->conf->options['failure_duration_threshold']
 		);
-        $html .= sprintf(
+		$html .= sprintf(
 			__('Markiere Links, die für mindestens %s Tage unterbrochen sind', 'psource-link-checker'),
 			$input_box
 		);
@@ -2437,13 +2449,13 @@ class wsBrokenLinkChecker {
 		******************************************/
 		// Check for safe mode
 		if( blcUtility::is_safe_mode() ){
-		    // Do it the safe mode way - obey the existing max_execution_time setting
-		    $t = ini_get('max_execution_time');
-		    if ($t && ($t < $max_execution_time))
-		    	$max_execution_time = $t-1;
+			// Do it the safe mode way - obey the existing max_execution_time setting
+			$t = ini_get('max_execution_time');
+			if ($t && ($t < $max_execution_time))
+				$max_execution_time = $t-1;
 		} else {
-		    // Do it the regular way
-		    @set_time_limit( $max_execution_time * 2 ); //x2 should be plenty, running any longer would mean a glitch.
+			// Do it the regular way
+			@set_time_limit( $max_execution_time * 2 ); //x2 should be plenty, running any longer would mean a glitch.
 		}
 
 		//Don't stop the script when the connection is closed
@@ -2458,18 +2470,18 @@ class wsBrokenLinkChecker {
 			&& (!defined('BLC_DEBUG') || !constant('BLC_DEBUG'))
 		){
 			@ob_end_clean(); //Discard the existing buffer, if any
-	 		header("Connection: close");
+			header("Connection: close");
 			ob_start();
 			echo ('Connection closed'); //This could be anything
 			$size = ob_get_length();
 			header("Content-Length: $size");
-	 		ob_end_flush(); // Strange behaviour, will not work
-	 		flush();        // Unless both are called !
- 		}
+			ob_end_flush(); // Strange behaviour, will not work
+			flush();        // Unless both are called !
+		}
 
- 		//Load modules for this context
- 		$moduleManager = blcModuleManager::getInstance();
- 		$moduleManager->load_modules('work');
+		//Load modules for this context
+		$moduleManager = blcModuleManager::getInstance();
+		$moduleManager->load_modules('work');
 
 		$target_usage_fraction = $this->conf->get('target_resource_usage', 0.25);
 		//Target usage must be between 1% and 100%.
@@ -2545,7 +2557,7 @@ class wsBrokenLinkChecker {
 		}
 
 		/******************************************
-				    Resynch done?
+					Resynch done?
 		*******************************************/
 		if ( $this->conf->options['need_resynch'] && !$still_need_resynch ){
 			$this->conf->options['need_resynch']  = $still_need_resynch;
@@ -2553,7 +2565,7 @@ class wsBrokenLinkChecker {
 		}
 
 		/******************************************
-				    Remove orphaned links
+					Remove orphaned links
 		*******************************************/
 
 		if ( $orphans_possible ) {
@@ -2606,9 +2618,9 @@ class wsBrokenLinkChecker {
 			foreach ($links as $link) {
 				//Does this link need to be checked? Excluded links aren't checked, but their URLs are still
 				//tested periodically to see if they're still on the exclusion list.
-        		if ( !$this->is_excluded( $link->url ) ) {
-        			//Check the link.
-        			//FB::log($link->url, "Checking link {$link->link_id}");
+				if ( !$this->is_excluded( $link->url ) ) {
+					//Check the link.
+					//FB::log($link->url, "Checking link {$link->link_id}");
 					$link->check( true );
 				} else {
 					//FB::info("The URL {$link->url} is excluded, skipping link {$link->link_id}.");
@@ -2618,7 +2630,7 @@ class wsBrokenLinkChecker {
 
 				//Check if we still have some execution time left
 				if( $this->execution_time() > $max_execution_time ){
-                    $transactionManager->commit();
+					$transactionManager->commit();
 					//FB::log('The allotted execution time has run out');
 					$blclog->info('Die zugewiesene Ausführungszeit ist abgelaufen.');
 					$this->release_lock();
@@ -2627,14 +2639,14 @@ class wsBrokenLinkChecker {
 
 				//Check if the server isn't overloaded
 				if ( $this->server_too_busy() ){
-                    $transactionManager->commit();
+					$transactionManager->commit();
 					//FB::log('Server overloaded, bailing out.');
 					$blclog->info('Serverlast zu hoch, Stoppe.');
 					$this->release_lock();
 					return;
 				}
 			}
-            $transactionManager->commit();
+			$transactionManager->commit();
 
 			$start = microtime(true);
 			$links = $this->get_links_to_check($max_links_per_query);
@@ -2720,23 +2732,23 @@ class wsBrokenLinkChecker {
 			$q = "SELECT DISTINCT links.*\n";
 		}
 		$q .= "FROM {$wpdb->prefix}blc_links AS links
-            INNER JOIN {$wpdb->prefix}blc_instances AS instances USING(link_id)
-            WHERE
-                (
-                    ( last_check_attempt < %s )
-                    OR
-                    (
-                        (broken = 1 OR being_checked = 1)
-                        AND may_recheck = 1
-                        AND check_count < %d
-                        AND last_check_attempt < %s
-                    )
-                )
+			INNER JOIN {$wpdb->prefix}blc_instances AS instances USING(link_id)
+			WHERE
+				(
+					( last_check_attempt < %s )
+					OR
+					(
+						(broken = 1 OR being_checked = 1)
+						AND may_recheck = 1
+						AND check_count < %d
+						AND last_check_attempt < %s
+					)
+				)
 
-            AND
-                ( instances.container_type IN ({$loaded_containers}) )
-                AND ( instances.parser_type IN ({$loaded_parsers}) )
-            ";
+			AND
+				( instances.container_type IN ({$loaded_containers}) )
+				AND ( instances.parser_type IN ({$loaded_parsers}) )
+			";
 
 		if ( !$count_only ){
 			$q .= "\nORDER BY last_check_attempt ASC\n";
@@ -2806,7 +2818,7 @@ class wsBrokenLinkChecker {
 				"<a href='%s' title='" . __('Anzeigen defekter Links', 'psource-link-checker') . "'><strong>".
 					_n('%d defekter Link gefunden', '%d defekte Links gefunden', $status['broken_links'], 'psource-link-checker') .
 				"</strong></a>",
-			  	esc_attr(admin_url('tools.php?page=view-broken-links')),
+				esc_attr(admin_url('tools.php?page=view-broken-links')),
 				$status['broken_links']
 			);
 		} else {
@@ -2954,12 +2966,12 @@ class wsBrokenLinkChecker {
 
 			$link->isOptionLinkChanged = true;
 
-            $transactionManager = TransactionManager::getInstance();
-            $transactionManager->start();
+			$transactionManager = TransactionManager::getInstance();
+			$transactionManager->start();
 
 			//Save the changes
 			if ( $link->save() ){
-                $transactionManager->commit();
+				$transactionManager->commit();
 				die( "OK" );
 			} else {
 				die( __("Hoppla, ich konnte den Link nicht ändern!", 'psource-link-checker') ) ;
@@ -2997,10 +3009,10 @@ class wsBrokenLinkChecker {
 
 			//Save the changes
 			$link->isOptionLinkChanged = true;
-            $transactionManager = TransactionManager::getInstance();
-            $transactionManager->start();
+			$transactionManager = TransactionManager::getInstance();
+			$transactionManager->start();
 			if ( $link->save() ){
-                $transactionManager->commit();
+				$transactionManager->commit();
 				die( "OK" );
 			} else {
 				die( __("Hoppla, ich konnte den Link nicht ändern!", 'psource-link-checker') ) ;
@@ -3244,10 +3256,10 @@ class wsBrokenLinkChecker {
 			)));
 		}
 
-        $transactionManager = TransactionManager::getInstance();
-        $transactionManager->start();
+		$transactionManager = TransactionManager::getInstance();
+		$transactionManager->start();
 
-        //In case the immediate check fails, this will ensure the link is checked during the next work() run.
+		//In case the immediate check fails, this will ensure the link is checked during the next work() run.
 		$link->last_check_attempt = 0;
 		$link->isOptionLinkChanged = true;
 		$link->save();
@@ -3255,7 +3267,7 @@ class wsBrokenLinkChecker {
 		//Check the link and save the results.
 		$link->check(true);
 
-        $transactionManager->commit();
+		$transactionManager->commit();
 
 		$status = $link->analyse_status();
 		$response = array(
@@ -3463,9 +3475,9 @@ class wsBrokenLinkChecker {
 		}
 
 		//Default PHP execution time limit
-	 	$debug['Default PHP execution time limit'] = array(
-	 		'state' => 'ok',
-	 		'value' => sprintf(__('%s Sekunden'), ini_get('max_execution_time')),
+		$debug['Default PHP execution time limit'] = array(
+			'state' => 'ok',
+			'value' => sprintf(__('%s Sekunden'), ini_get('max_execution_time')),
 		);
 
 		//Database character set. Usually it's UTF-8. Setting it to something else can cause problems
@@ -3478,15 +3490,15 @@ class wsBrokenLinkChecker {
 
 		//Resynch flag.
 		$debug['Resynch. flag'] = array(
-	 		'state' => 'ok',
-	 		'value' => sprintf('%d', $this->conf->options['need_resynch'] ? '1 (resynch. required)' : '0 (resynch. nicht benötigt)'),
+			'state' => 'ok',
+			'value' => sprintf('%d', $this->conf->options['need_resynch'] ? '1 (resynch. required)' : '0 (resynch. nicht benötigt)'),
 		);
 
 		//Synch records
 		$synch_records = intval($wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}blc_synch"));
 		$data = array(
-	 		'state' => 'ok',
-	 		'value' => sprintf('%d', $synch_records),
+			'state' => 'ok',
+			'value' => sprintf('%d', $synch_records),
 		);
 		if ( $synch_records == 0 ){
 			$data['state'] = 'warning';
@@ -3789,9 +3801,9 @@ class wsBrokenLinkChecker {
    */
 	function setup_cron_events(){
 
-        //Link monitor
-        if ( $this->conf->options['run_via_cron'] ){
-            if (!wp_next_scheduled('blc_cron_check_links')) {
+		//Link monitor
+		if ( $this->conf->options['run_via_cron'] ){
+			if (!wp_next_scheduled('blc_cron_check_links')) {
 				wp_schedule_event( time(), '10min', 'blc_cron_check_links' );
 			}
 		} else {
